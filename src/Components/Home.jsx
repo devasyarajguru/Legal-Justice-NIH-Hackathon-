@@ -1,4 +1,6 @@
 import '../CSS/Home.css'
+import SlideInnerSvg from '../assets/slide-inner.svg';
+import MainHouseSvg from '../assets/main-house.svg';
 
 const Home = () =>
     {
@@ -17,7 +19,7 @@ const Home = () =>
                 {/* Slide main inner */}
                 <div className="slide-main-inner">
                     {/* Inner */}
-                    <img src="../images/slide-inner.svg" />
+                    <img src={SlideInnerSvg} />
                     {/* Inner */}
                         
                     {/* Round-1  */}
@@ -179,7 +181,7 @@ const Home = () =>
     <div className="right-side">
         <div className="grey-div first">
         </div>
-            <img src="../images/main-house.svg" className="main-house-svg" alt="my image"/>
+            <img src={MainHouseSvg} className="main-house-svg" alt="my image"/>
         <div className="grey-div second">
         </div>
     </div>
