@@ -11,7 +11,7 @@ function App() {
 
   return (
     <>
-    <div className='app-container'>
+    {/* <div className='app-container'> */}
       <Sidebar />
       <div className='main-content'>
       <Routes>
@@ -22,7 +22,7 @@ function App() {
         <Route path='login' element={<Login />} />
       </Routes>
       </div>
-    </div>
+    {/* </div> */}
       
     </>
   )
