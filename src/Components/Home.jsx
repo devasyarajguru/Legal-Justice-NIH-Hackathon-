@@ -6,23 +6,23 @@ const Home = () =>
     {
         return (
             <>
-                 {/* home-container */}
+     {/* <!--home-container--> */}
     <div className="home-container">
-        {/* Left Side */}
+        {/* <!--Left Side--> */}
         <div className="home-left-side">
             <div className="rectangle-6"></div>    
                 <p>
-                Empowering Legal Awarene<span style={{color:"white"}}>ss </span>and Compliance in India
+                Empowering Legal Awarene<span style="color:white">ss </span>and Compliance in India
                 </p>
-                {/* Slide main */}
+                {/* <!--Slide main--> */}
                 <div className="slide-main">
-                {/* Slide main inner */}
+                {/* <!--Slide main inner--> */}
                 <div className="slide-main-inner">
-                    {/* Inner */}
+                    {/* <!--Inner--> */}
                     <img src={SlideInnerSvg} />
-                    {/* Inner */}
+                    {/* <!--Inner--> */}
                         
-                    {/* Round-1  */}
+                    {/* <!--Round-1 --> */}
                     <svg xmlns="http://www.w3.org/2000/svg" className="round-1" width="109" height="109" viewBox="0 0 189 189" fill="none">
                     <g filter="url(#filter0_d_156_78669)">
                     <circle cx="94.5" cy="90.5" r="90.5" fill="white"/>
@@ -40,9 +40,9 @@ const Home = () =>
                     </filter>
                   </defs>
                 </svg>
-                    {/* Round-1 ends */}
+                    {/* <!--Round-1 ends--> */}
 
-                    {/* Round-2  */}
+                    {/* <!--Round-2 --> */}
                             <svg xmlns="http://www.w3.org/2000/svg" className="round-2" width="70" height="70" viewBox="0 0 156 156" fill="none">
                                 <g filter="url(#filter0_d_156_78670)">
                                   <path d="M143.632 73.2483C143.632 111.568 112.568 142.632 74.2486 142.632C35.9292 142.632 4.86523 111.568 4.86523 73.2483C4.86523 34.9289 35.9292 3.86493 74.2486 3.86493C112.568 3.86493 143.632 34.9289 143.632 73.2483Z" fill="white"/>
@@ -60,9 +60,9 @@ const Home = () =>
                                   </filter>
                                 </defs>
                               </svg>
-                    {/* Round-2 ends */}
+                    {/* <!--Round-2 ends--> */}
 
-                    {/* Round-3  */}
+                    {/* <!--Round-3 --> */}
 
                               <svg xmlns="http://www.w3.org/2000/svg" className="round-3" width="50" height="38" viewBox="0 0 106 46" fill="none">
                                 <g clipPath="url(#clip0_156_78671)">
@@ -113,20 +113,20 @@ const Home = () =>
                                   </clipPath>
                                 </defs>
                               </svg>
-                    {/* Round-3 ends */}
+                    {/* <!--Round-3 ends--> */}
 
                 </div>
-                {/* Slide main inner ends */}
+                {/* <!--Slide main inner ends--> */}
 
-                {/* slide main Content */}
+                {/* <!--slide main Content--> */}
                     <div className="slide-main-content">
-                        {/* slide-main-content-heading */}
+                        {/* <!--slide-main-content-heading--> */}
                         <div className="slide-main-content-heading">
                             <span className="justice">Justice</span> Chatbot
                         </div>
-                         {/* line-dot-content  */}
+                        {/* <!-- line-dot-content --> */}
                         <div className="line-dot-content">
-                        {/* svg class */}
+                        {/* <!--svg class--> */}
                             <div className="svg">
                             <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 11 11" fill="none">
                                 <path d="M10.3647 5.25C10.3647 8.1495 8.04448 10.5 5.18235 10.5C2.32022 10.5 0 8.1495 0 5.25C0 2.35051 2.32022 0 5.18235 0C8.04448 0 10.3647 2.35051 10.3647 5.25Z" fill="black"/>
@@ -155,7 +155,7 @@ const Home = () =>
                                                 <path d="M10.3647 5.25C10.3647 8.1495 8.04448 10.5 5.18235 10.5C2.32022 10.5 0 8.1495 0 5.25C0 2.35051 2.32022 0 5.18235 0C8.04448 0 10.3647 2.35051 10.3647 5.25Z" fill="black"/>
                                                 </svg>
                             </div>
-                         {/* svg class ends  */}
+                        {/* <!-- svg class ends --> */}
 
                             <ul>
                                 <li>Instant Legal Information</li>
@@ -166,18 +166,18 @@ const Home = () =>
                             </ul>
 
                         </div>
-                         {/* line-dot-content ends  */}
+                        {/* <!-- line-dot-content ends --> */}
                     </div>
-                {/* slide main Content ends */}
+                {/* <!--slide main Content ends--> */}
             </div>
-                {/* Slide main ends */}
+                {/* <!--Slide main ends--> */}
 
-        {/* Left Side ends */}
+        {/* <!--Left Side ends--> */}
     </div>
     </div>
-     {/* home-container ends */}
+     {/* <!--home-container ends--> */}
 
-     {/* Right Side of Home page */}
+     {/* <!--Right Side of Home page--> */}
     <div className="right-side">
         <div className="grey-div first">
         </div>
