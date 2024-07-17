@@ -1,3 +1,74 @@
+*
+{
+    box-sizing: border-box;
+}
+body{
+    margin:0;
+    padding:0;
+    display: flex;
+    overflow-y: hidden;
+}
+
+.sidebar
+{
+    width: 89px;
+    height: 100vh;
+    background-color: #4F5DFC;
+    box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
+    overflow:auto;
+}
+
+.justice-side-logo
+{
+    margin: 5px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.link-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    list-style: none;
+    padding: 0;
+}
+
+.link-list li {
+    display: block;
+    margin-bottom: 20px; 
+}
+
+.link-list li a {
+    display: block;
+    text-decoration: none;
+    padding: 10px;
+    border-radius: 5px;
+    color: white; /* Text color */
+    transition: background-color 0.3s ease, transform 0.3s ease, color 0.3s ease;
+}
+
+.link-list li a:hover {
+    background-color:#4F5DFC; 
+    transform: scale(1.05); 
+    color: #ffffff; 
+}
+
+#chat-img
+{
+    border-radius: 10px;
+    background-color: gray;
+    padding: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#chat-img:hover {
+    background-color: darkgray;
+    transform: scale(1.05);
+}
 .logo
 {
     margin: 20px;
