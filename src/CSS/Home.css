@@ -1,304 +1,70 @@
-*
-{
-    box-sizing: border-box;
-}
-body{
-    margin:0;
-    padding:0;
-    display: flex;
-    overflow-y: hidden;
-}
-
-.sidebar
-{
-    width: 89px;
-    height: 100vh;
-    background-color: #4F5DFC;
-    box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
-    overflow:auto;
-}
-
-.justice-side-logo
-{
-    margin: 5px;
-    padding: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.link-list {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-top: 30px;
-    list-style: none;
-    padding: 0;
-}
-
-.link-list li {
-    display: block;
-    margin-bottom: 20px; 
-}
-
-.link-list li a {
-    display: block;
-    text-decoration: none;
-    padding: 10px;
-    border-radius: 5px;
-    color: white; /* Text color */
-    transition: background-color 0.3s ease, transform 0.3s ease, color 0.3s ease;
-}
-
-.link-list li a:hover {
-    background-color:#4F5DFC; 
-    transform: scale(1.05); 
-    color: #ffffff; 
-}
-
-#chat-img
-{
-    border-radius: 10px;
-    background-color: gray;
-    padding: 5px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-#chat-img:hover {
-    background-color: darkgray;
-    transform: scale(1.05);
-}
-.logo
-{
-    margin: 20px;
-    margin-bottom: 50px;
-    display: block;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-}
-
-.logo svg {
-    position: absolute;
-    top: 60%;
-    left: 40%;
-    transform: translate(-50%, -50%);
-}
-.logo-down-text
-{
-    margin-left: 10px;
-    text-align: center;
-    font-size: 33px;
-    color: #000000;
-    font-family: 'Roboto', sans-serif;
-    font-weight:bold;
-}
-.logo-down-text-two
-{
-    font-weight: 600;
-    margin-left: 8px;
-    margin-top: -6px;
-    text-align: center;
-    font-size: 10px;
-    color: #000000;
-    font-family: 'Raleway', sans-serif;
-}
-
 .home-container{
     display: flex;
-    flex: 1;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
 }
 
-.rectangle-6
+.home-left-side
 {
-    position: absolute;
-    top: 10;
-    left:550px;
-    width: 100px;
-    height: 100px;
-    transform: rotate(-45deg);
-    border-radius: 20px;
-    border: 74px solid #FFF;
-    z-index: -1;
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 4px 4px 30px 7px rgba(0, 0, 0, 0.20);
+    background-color: red;
+    flex: 1;
+    max-width: 50%;
+    padding: 10px;
 }
 
 .home-container p
 {
-position: absolute;
-width: 600px;
-height: 126px;
-left: 135px;
-top: -5px;
-font-family: 'Roboto', sans-serif;
-font-style: normal;
-font-weight: 700;
-font-size: 38px;
-color: rgba(0, 0, 0, 0.58);
-
-}
-
-.slide-main
-{
-position: absolute;
-width: 350px;
-height: 420px;
-left: 145px;
-top: 142px;
-background: rgba(0, 0, 0, 0.04);
-border-radius: 24px;
-}
-
-.slide-main-inner
-{
-    padding: 10px;
-    margin-top: -20px;
-}
-
-.round-1
-{
-    position: absolute;
-    left: 125px;
-    top: 30px;
-}
-
-.round-2
-{
-    position: absolute;
-    left: 145px;
-    top: 50px;
-}
-
-.round-3
-{
-    position: absolute;
-    left: 155px;
-    top: 65px;
-}
-
-.slide-main-content
-{
-    /* background-color: rebeccapurple; */
-    padding: 10px;
-    margin-top: -40px;
-}
-
-.slide-main-content-heading
-{
-    text-align: center;
-    font-size: 23px;
-    margin-bottom: 20px;
-    font-weight: 800;
+    margin-left: 40px;
     font-family: 'Roboto', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 2.675rem; 
+    color: rgba(0, 0, 0, 0.58);
+    max-width: 100%; 
+    width:1300px;
 }
 
-.line-dot-content
+.home-right-side
 {
-    display: flex;
-    margin-top: -20px;
-}
-
-.svg svg
-{
-    display: block;
-    margin: 25px;
-    /* padding: 10px; */
-}
-
-.line-svg-one
-{
-    position: absolute;
-    top: 205px;
-    left: 12px;
-}
-
-.line-svg-two
-{
-    position: absolute;
-    top: 235px;
-    left: 12px;
-}
-
-.line-svg-three
-{
-    position: absolute;
-    top: 265px;
-    left: 12px;
-}
-
-.line-svg-four
-{
-    position: absolute;
-    top: 305px;
-    left: 12px;
-}
-
-
-.slide-main-content ul
-{
-    list-style: none;
-    margin-top: 19px;
-    margin-left: -15px;
-}
-
-.slide-main-content li{
-    /* margin: 10px; */
-    margin-bottom: 15px;
-}
-
-.right-side
-{
-    display: flex;
-    flex:1
+    background-color: blue;
+    flex: 1;
+    max-width: 50%;
+    padding: 10px;
+    
 }
 
 .grey-div {
+    background-color: green;
     height: 100%;
     border-radius: 0px 0px 0px 38.05px;
     position: absolute;
     top: 0;
-  }
-  
-  .first {
-    margin-left: -80px;
-    left: 1;
+}
+
+.first {
     width: 218px; /* Adjust the width as needed */
     background: rgba(217, 217, 217, 0.79);
     z-index: -1;
-  }
-  
-  .second {
+}
+
+.second {
     right: 0;
     width: 228px; /* Adjust the width as needed */
     background: rgba(217, 217, 217, 0.79);
     z-index: -1;
-  }
-  
-  .main-house-svg
-  {
-    /* margin: 20px;
-    padding: 20px; */
-    width: 600px;
+}
+
+.main-house-svg
+{
     margin-top: 40px;
-    margin-left: -40px;
     height: 80%;
-  z-index: 1; 
-  position: relative;
-  }
-
- 
-.legal {
-    /* Apply your CSS styles for 'Legal' here */
-    color: green;
-    /* Other styles */
+    z-index: 1; 
+    position: relative;
 }
 
-.expert {
-    /* Apply your CSS styles for 'Expert' here */
-    color: red;
-    /* Other styles */
-}
+
+
 
 
