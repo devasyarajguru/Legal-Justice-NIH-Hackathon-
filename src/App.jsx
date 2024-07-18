@@ -11,7 +11,8 @@ function App() {
 
   return (
     <>
-    {/* <div className='app-container'> */}
+    {/* Amma Sidebar and App container class flex css ma che etle badha svgs home jsx ma differ thayela che */}
+    <div className='app-container'>
       <Sidebar />
       <div className='main-content'>
       <Routes>
@@ -22,7 +23,7 @@ function App() {
         <Route path='login' element={<Login />} />
       </Routes>
       </div>
-    {/* </div> */}
+    </div>
       
     </>
   )
