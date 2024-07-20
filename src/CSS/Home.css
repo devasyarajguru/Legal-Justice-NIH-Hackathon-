@@ -1,6 +1,5 @@
 .home-container{
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
     width: 100%;
@@ -8,7 +7,6 @@
 
 .home-left-side
 {
-    background-color: red;
     flex: 1;
     max-width: 50%;
     padding: 10px;
@@ -26,17 +24,15 @@
     width:1300px;
 }
 
+
 .home-right-side
 {
-    background-color: blue;
-    flex: 1;
-    max-width: 50%;
-    padding: 10px;
-    
+    flex:1;
+    /* max-width: 50%; */
+    /* padding: 10px; */
 }
 
 .grey-div {
-    background-color: green;
     height: 100%;
     border-radius: 0px 0px 0px 38.05px;
     position: absolute;
@@ -44,27 +40,17 @@
 }
 
 .first {
-    width: 218px; /* Adjust the width as needed */
+    width: 218px; 
     background: rgba(217, 217, 217, 0.79);
     z-index: -1;
 }
 
 .second {
     right: 0;
-    width: 228px; /* Adjust the width as needed */
+    width: 278px; 
     background: rgba(217, 217, 217, 0.79);
     z-index: -1;
 }
-
-.main-house-svg
-{
-    margin-top: 40px;
-    height: 80%;
-    z-index: 1; 
-    position: relative;
-}
-
-
 
 
 
