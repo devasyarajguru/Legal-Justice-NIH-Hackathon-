@@ -6,12 +6,12 @@ const Home = () =>
     {
         return (
             <>
-    {/* <!--home-container--> */}
+    {/* <!--home-container Starts--> */}
     <div className="home-container">
         {/* <!--Left Side Starts--> */}
         <div className="home-left-side">
         <p>
-          Empowering Legal Awarene<span style={{"color":"white"}}>ss </span>and Compliance in India
+          Empowering Legal Awareness and Compliance in India
         </p>
         </div>
         {/* <!--Left Side Ends--> */}
@@ -20,13 +20,15 @@ const Home = () =>
         <div className='home-right-side'>
         <div className="grey-div first">
         </div>
-            <img src={MainHouseSvg} className="main-house-svg" alt="my image"/>
+            <img src={MainHouseSvg} className="main-house-svg" alt="my image" />
         <div className="grey-div second">
         </div>
         </div>
         {/* <!--Right Side Ends--> */}
     </div>
-    {/* <!--home-container--> */}
+    {/* <!--home-container Ends--> */}
+
+    {/* Note: In the previous code there was separate right side div after home container */}
 
             </>
         )
