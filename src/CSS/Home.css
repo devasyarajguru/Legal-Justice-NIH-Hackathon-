@@ -24,12 +24,9 @@
     width:1300px;
 }
 
-
 .home-right-side
 {
     flex:1;
-    /* max-width: 50%; */
-    /* padding: 10px; */
 }
 
 .grey-div {
@@ -40,7 +37,8 @@
 }
 
 .first {
-    width: 218px; 
+    margin-left: -60px;
+    width: 278px; 
     background: rgba(217, 217, 217, 0.79);
     z-index: -1;
 }
@@ -52,5 +50,157 @@
     z-index: -1;
 }
 
+.main-house-svg
+{
+    max-width:650px;
+}
+
+.slide-main
+{
+position: absolute;
+width: 350px;
+height: 420px;
+left: 185px;
+top: 210px;
+background: rgba(0, 0, 0, 0.04);
+border-radius: 24px;
+}
+
+.slide-main-inner
+{
+    padding: 10px;
+    margin-top: -20px;
+}
+
+.round-1
+{
+    position: absolute;
+    left: 125px;
+    top: 30px;
+}
+
+.round-2
+{
+    position: absolute;
+    left: 145px;
+    top: 50px;
+}
+
+.round-3
+{
+    position: absolute;
+    left: 155px;
+    top: 65px;
+}
+
+.slide-main-content
+{
+    /* background-color: rebeccapurple; */
+    padding: 10px;
+    margin-top: -40px;
+}
+
+.slide-main-content-heading
+{
+    text-align: center;
+    font-size: 23px;
+    margin-bottom: 20px;
+    font-weight: 800;
+    font-family: sans-serif;
+}
+
+.line-dot-content
+{
+    display: flex;
+    margin-top: -20px;
+}
+
+.svg svg
+{
+    display: block;
+    margin: 25px;
+    /* padding: 10px; */
+}
+
+.line-svg-one
+{
+    position: absolute;
+    top: 205px;
+    left: 12px;
+}
+
+.line-svg-two
+{
+    position: absolute;
+    top: 238px;
+    left: 12px;
+}
+
+.line-svg-three
+{
+    position: absolute;
+    top: 275px;
+    left: 12px;
+}
+
+.line-svg-four
+{
+    position: absolute;
+    top: 305px;
+    left: 12px;
+}
+
+
+.slide-main-content ul
+{
+    list-style: none;
+    margin-top: 19px;
+    margin-left: -15px;
+}
+
+.slide-main-content li{
+    /* margin: 10px; */
+    margin-bottom: 15px;
+}
+
+
+.rectangle-6
+        {
+            position: absolute;
+            top: 10;
+            left:658px;
+            width: 100px;
+            height: 100px;
+            transform: rotate(-45deg);
+            border-radius: 20px;
+            border: 74px solid #FFF;
+            z-index: -1;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 4px 4px 30px 7px rgba(0, 0, 0, 0.20);
+        }
+
+.heading-justice
+{
+      background-color: #FF7F50;
+      padding: 5px;
+      border-radius: 10px;
+      color: white;
+}
+
+.heading-legal
+{
+  background-color: #1E90FF;
+  padding: 5px;
+  border-radius: 10px;
+  color: white;
+}
+
+.heading-expert
+{
+      background-color: #8A2BE2;
+      padding: 5px;
+      border-radius: 10px;
+      color: white;
+}
 
 
