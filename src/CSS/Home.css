@@ -59,7 +59,7 @@
 {
 position: absolute;
 width: 350px;
-height: 420px;
+height: 430px;
 left: 185px;
 top: 210px;
 background: rgba(0, 0, 0, 0.04);
@@ -203,4 +203,10 @@ border-radius: 24px;
       color: white;
 }
 
-
+.list-items
+{
+    font-family: cursive;
+    /* font-family: system-ui; */
+    /* font-family: serif; */
+    /* font-family: Georgia, serif; */
+}
