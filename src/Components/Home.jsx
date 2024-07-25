@@ -8,7 +8,7 @@ const Home = () =>
         const headings = ['Justice', 'Legal', 'Expert'];
         const subheadings = ['Chatbot','Assistance','Support']
         const categories = [
-            ["Instant Legal Information", "Self-Help Legal Exploration", "Legal Learning Resources", "Efficient Legal Support System", "User-Friendly Interface"],
+            ["Instant Legal Information", "Self-Help Legal Exploration and Foundation", "Legal Learning Resources", "Efficient Legal Support System", "User-Friendly Interface"],
             ["Category-Specific Assistance", "Empowerment Through Knowledge", "Case Evaluation and Strategy", "Legal Research and Information", "Educational Resources"],
             ["Direct Access to Legal Professionals", "Personalized Consultations", "Confidentiality and Privacy", "Case-Specific Guidance", "Document Review and Drafting"]
         ];
@@ -65,6 +65,7 @@ const Home = () =>
                     {/* <!--Inner--> */}
                     <img src={SlideInnerSvg} />
                     {/* <!--Inner--> */}
+                    
                         
                     {/* <!--Round-1 --> */}
                     <svg xmlns="http://www.w3.org/2000/svg" className="round-1" width="109" height="109" viewBox="0 0 189 189" fill="none">
@@ -201,7 +202,7 @@ const Home = () =>
                             </div>
                         {/* <!-- svg class ends --> */}
 
-                            <ul>
+                            <ul className='list-items'>
                                 {categories[currentCategories].map((item , index) =>
                                 (
                                     <li key={index}>{item}</li>
