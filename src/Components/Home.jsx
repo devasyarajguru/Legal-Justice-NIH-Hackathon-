@@ -45,7 +45,7 @@ const Home = () =>
             },3000)
 
             return () => clearInterval(interval)
-        }, [])
+        }, [headings.length , subheadings.length , categories.length])
 
         return (
             <>
