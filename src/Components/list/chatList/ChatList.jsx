@@ -25,35 +25,21 @@ const ChatList = () =>
                     {/* search class ends */}
 
                 {/* Chat item starts*/}
-          
-                <div className="item">
-                    <img src={avatar} alt='user'/>
-                    <div className="texts">
-                        <span>Devasya Rajguru</span>
-                        <p>Hello</p>
+            
+                <div className="chatItem-container">
+
+                {Array(10).fill().map((_, index) => (
+                    <div className="item" key={index}>
+                        <img src={avatar} alt='user' />
+                        <div className="texts">
+                            <span>Devasya Rajguru</span>
+                            <p>Hello</p>
+                        </div>
                     </div>
-                </div>
-                <div className="item">
-                    <img src={avatar} alt='user'/>
-                    <div className="texts">
-                        <span>Devasya Rajguru</span>
-                        <p>Hello</p>
-                    </div>
-                </div>
-                <div className="item">
-                    <img src={avatar} alt='user'/>
-                    <div className="texts">
-                        <span>Devasya Rajguru</span>
-                        <p>Hello</p>
-                    </div>
-                </div>
-                <div className="item">
-                    <img src={avatar} alt='user'/>
-                    <div className="texts">
-                        <span>Devasya Rajguru</span>
-                        <p>Hello</p>
-                    </div>
-                </div>
+                ))}
+
+                {/* Chat item ends*/}
+            </div>
                 
             </div>
             // chatList main container ends
