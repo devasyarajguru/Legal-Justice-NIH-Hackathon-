@@ -1,14 +1,8 @@
-/* .chatList
-{
-    flex: 1;
-    overflow: scroll;
-} */
-
 .chatList {
-    background-color: aqua;
+    /* background-color: aqua; */
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow-y: scroll;
     height: 100%;
     max-height: 100vh;
 }
@@ -50,13 +44,6 @@
    width: 25px;
    height: 25px; 
    cursor: pointer;
-}
-
-.chatItem-container {
-    flex: 1;
-    overflow-y: auto;
-    max-height: 100vh; 
-    background-color: green;
 }
 
 .item
