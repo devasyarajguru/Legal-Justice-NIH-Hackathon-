@@ -26,7 +26,6 @@ const ChatList = () =>
 
                 {/* Chat item starts*/}
             
-                <div className="chatItem-container">
 
                 {Array(10).fill().map((_, index) => (
                     <div className="item" key={index}>
@@ -39,7 +38,7 @@ const ChatList = () =>
                 ))}
 
                 {/* Chat item ends*/}
-            </div>
+            
                 
             </div>
             // chatList main container ends
