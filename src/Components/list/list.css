@@ -9,7 +9,8 @@
     flex: 1 !important;
     display: flex;
     flex-direction: column;
-    max-height: 100vh; 
-    background-color: red;
+    max-height: 100vh;
+    height: 100%;
+    /* background-color: red; */
 }
 
