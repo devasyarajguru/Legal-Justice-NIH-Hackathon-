@@ -32,7 +32,7 @@ const ChatList = () =>
                         <img src={avatar} alt='user' />
                         <div className="texts">
                             <span>Devasya Rajguru</span>
-                            <p>Hello</p>
+                            <p>Hello My name is Devasya. I have reached out to you for some work</p>
                         </div>
                     </div>
                 ))}
