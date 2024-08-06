@@ -2,5 +2,67 @@
 {
     padding: 20px;
     flex: 2 !important;
-    /* max-width: 600px; */
+    height: 100%;
 }
+
+.top
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid black;
+}
+
+.user
+{
+    display: flex;
+    align-items: center;
+    gap:20px;
+}
+
+.user img
+{
+    height: 50px;
+    width: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.user-texts 
+{
+    display: flex;
+    flex-direction: column;
+    /* width: 500px; */
+}
+
+.user-texts span
+{
+    font-weight: 800;
+    font-size: 31px;
+    color: #4F5DFC;
+    font-family: sans-serif;
+    font-style: normal;
+}
+
+.user-texts p
+{
+    font-weight: 300;
+    font-size: 14px;
+    margin-top: -1px;
+    font-family: sans-serif;
+    color: #0CCC36;
+    font-style: normal;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
