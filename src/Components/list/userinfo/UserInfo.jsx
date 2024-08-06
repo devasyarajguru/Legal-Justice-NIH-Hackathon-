@@ -10,7 +10,7 @@ const UserInfo = () =>
             // UserInfo Starts
         <div className="userInfo">
                 {/* user class starts */}
-            <div className="user">
+            <div className="user-chatList">
                 <img src={avatar} alt="user" className='user-img' />
                 <h2>Devasya Rajguru</h2>
             </div>
