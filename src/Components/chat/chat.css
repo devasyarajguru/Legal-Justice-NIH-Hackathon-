@@ -54,6 +54,29 @@
     font-style: normal;
 }
 
+.bottom
+{
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #dddddd35;
+}
+
+.bottom-icons
+{
+    background-color: red;
+    display: flex;
+    gap: 20px;
+}
+
+.bottom-icons img
+{
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
 
 
 
