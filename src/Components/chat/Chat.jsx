@@ -27,18 +27,26 @@ const Chat = () =>
             <div className="center"></div>
             {/* bottom class starts */}
             <div className="bottom">
-                <input type='text' placeholder='Type a message...'/>
-                <div className="emoji">
-                    <div className="bottom-icons">
-                        <img src={img} alt=''/>
-                        <img src={camera} alt=''/>
-                        <img src={mic} alt=''/>
-                    </div>
-                    <img src={emoji} />
+                {/* icons  */}
+                <div className="bottom-icons">
+                        <img src={img} alt='image-icon'/>
+                        <img src={camera} alt='camera-icon'/>
+                        <img src={mic} alt='mic-icon'/>
                 </div>
+                {/* icons  */}
+
+                    <input type='text' placeholder='Type a message...'/> 
+
+                    {/* emoji class starts */}
+                    <div className="emoji">
+                        <img src={emoji} alt='emoji'/>
+                    </div>
+                    {/* emoji class ends */}
+
                 <button className="sendButton">Send</button>
             </div>
             {/* bottom class ends */}
+    
 
         </div>
         // chat main container ends
