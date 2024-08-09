@@ -3,6 +3,7 @@
     padding: 20px;
     flex: 2 !important;
     height: 100%;
+    /* width: 800px; */
 }
 
 .top
@@ -58,14 +59,15 @@
 {
     padding: 20px;
     display: flex;
+    gap: 15px;
     align-items: center;
-    justify-content: space-between;
+    justify-content:space-between;
     border-top: 1px solid #dddddd35;
+    width: 100%;
 }
 
 .bottom-icons
 {
-    background-color: red;
     display: flex;
     gap: 20px;
 }
@@ -76,6 +78,42 @@
     height: 20px;
     cursor: pointer;
 }
+
+.emoji img
+{
+    width: 23px;
+    height: 23px;
+    cursor: pointer;
+}
+
+.bottom input
+{
+flex: 1;
+background-color: #FFFFFF;
+box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+border-radius: 8px;
+outline: none;
+border: none;
+padding: 15px;
+width: 400px;
+font-size: 16px;
+}
+
+.sendButton
+{
+    background-color: #808080A8;
+    color: white;
+    font-weight: 700;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+
+
+
 
 
 
