@@ -1,9 +1,10 @@
 .chat
 {
     padding: 20px;
-    flex: 2 !important;
+    flex: 2 ;
     height: 100%;
-    /* width: 800px; */
+    display: flex;
+    flex-direction: column;
 }
 
 .top
@@ -55,6 +56,12 @@
     font-style: normal;
 }
 
+.center
+{
+    padding: 20px;
+    flex: 1;
+}
+
 .bottom
 {
     padding: 20px;
@@ -64,6 +71,7 @@
     justify-content:space-between;
     border-top: 1px solid #dddddd35;
     width: 100%;
+    margin-top: auto;
 }
 
 .bottom-icons
@@ -99,9 +107,21 @@ width: 400px;
 font-size: 16px;
 }
 
+.emoji
+{
+    position: relative;
+}
+
+.picker
+{
+    position: absolute;
+    bottom: 50px;
+    left: 0;
+}
+
 .sendButton
 {
-    background-color: #808080A8;
+    background-color: #696969;
     color: white;
     font-weight: 700;
     padding: 10px 20px;
