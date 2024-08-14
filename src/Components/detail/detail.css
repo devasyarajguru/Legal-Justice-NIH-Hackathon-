@@ -1,8 +1,5 @@
 .detail
 {
-    flex:1 !important;
-    /* max-width: 300px; */
+    flex:1;
     background-color:rgb(185, 236, 237);
-
-
 }
