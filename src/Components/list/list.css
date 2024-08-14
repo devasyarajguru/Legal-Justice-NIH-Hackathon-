@@ -1,12 +1,6 @@
-/* .list
-{
-    flex: 1 !important;
-    display: flex;
-    flex-direction: column;
-} */
 .list
 {
-    flex: 1 !important;
+    flex: 1 ;
     display: flex;
     flex-direction: column;
     max-height: 100vh;
