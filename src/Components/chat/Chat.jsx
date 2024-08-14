@@ -40,7 +40,52 @@ const Chat = () =>
             </div>
             {/* top class ends */}
 
-            <div className="center"></div>
+            {/* Center class starts */}
+            <div className="center">
+                <div className="chat-message">
+                    <img src={avatar} alt='avatar'/>
+                        <div className="chat-texts">
+                            <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.
+                                
+                            </p>
+                            <span>1 min ago</span>
+                        </div>
+                </div>
+                <div className="chat-message own">
+                        <div className="chat-texts">
+                            <p className="own-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
+                            <span>1 min ago</span>
+                        </div>
+                </div>
+                <div className="chat-message">
+                    <img src={avatar} alt='avatar'/>
+                        <div className="chat-texts">
+                            <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
+                            <span>1 min ago</span>
+                        </div>
+                </div>
+                <div className="chat-message own">
+                        <div className="chat-texts">
+                            <p className="own-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
+                            <span>1 min ago</span>
+                        </div>
+                </div>
+                <div className="chat-message">
+                    <img src={avatar} alt='avatar'/>
+                        <div className="chat-texts">
+                            <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
+                            <span>1 min ago</span>
+                        </div>
+                </div>
+                <div className="chat-message own">
+                        <div className="chat-texts">
+                            <p className="own-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
+                            <span>1 min ago</span>
+                        </div>
+                </div>
+            </div>
+            {/* Center class ends */}
+
             {/* bottom class starts */}
             <div className="bottom">
                 {/* icons  */}
