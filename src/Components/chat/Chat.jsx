@@ -43,7 +43,7 @@ const Chat = () =>
             {/* Center class starts */}
             <div className="center">
                 <div className="chat-message">
-                    <img src={avatar} alt='avatar'/>
+                    <img src={avatar} alt='avatar'  className="user-avatar"/>
                         <div className="chat-texts">
                             <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.
                                 
@@ -53,12 +53,13 @@ const Chat = () =>
                 </div>
                 <div className="chat-message own">
                         <div className="chat-texts">
+                            <img src="https://picsum.photos/200/300" className='sender-image'/>
                             <p className="own-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
                             <span>1 min ago</span>
                         </div>
                 </div>
                 <div className="chat-message">
-                    <img src={avatar} alt='avatar'/>
+                    <img src={avatar} alt='avatar' className="user-avatar"/>
                         <div className="chat-texts">
                             <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
                             <span>1 min ago</span>
@@ -71,7 +72,7 @@ const Chat = () =>
                         </div>
                 </div>
                 <div className="chat-message">
-                    <img src={avatar} alt='avatar'/>
+                    <img src={avatar} alt='avatar' className="user-avatar"/>
                         <div className="chat-texts">
                             <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
                             <span>1 min ago</span>
