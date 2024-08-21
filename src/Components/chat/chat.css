@@ -81,11 +81,6 @@
     align-self: flex-end;
 }
 
-.chat-texts
-{
-    font-family: sans-serif;
-}
-
 .sender-text
 {
     background-color: #2094FF;
@@ -169,6 +164,26 @@ font-size: 16px;
     cursor: pointer;
 }
 
+.user-avatar
+{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chat-texts
+{
+    font-family: sans-serif;
+}
+
+.sender-image
+{
+    height: 300px;
+    width: 100%;
+    border: 10px;
+    object-fit: cover;
+}
 
 
 
