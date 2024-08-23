@@ -1,5 +1,59 @@
 .detail
 {
     flex:1;
-    background-color:rgb(185, 236, 237);
+    /* background-color:rgb(185, 236, 237); */
+}
+
+.detail-user
+{
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.detail-user img
+{
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.detail-info
+{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.photos
+{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px;
+}
+
+.photoItem
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.photoDetail 
+{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+
+.photoDetail img
+{
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    object-fit: cover;
 }
