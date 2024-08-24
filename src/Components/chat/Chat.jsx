@@ -5,7 +5,7 @@ import img from './assets/img.png';
 import camera from './assets/camera.png';
 import mic from './assets/mic.png';
 import EmojiPicker from 'emoji-picker-react';
-import {useState} from 'react'
+import {useRef, useState , useEffect} from 'react'
 
 const Chat = () =>
 { 
@@ -22,6 +22,12 @@ const Chat = () =>
         setOpen(false)
     }
 
+    const endRef = useRef(null) 
+
+    useEffect(() =>
+    {
+        endRef.current.scrollIntoView({behaviour:"smooth"})
+    },[])
 
     return (
         // chat main container starts
@@ -45,7 +51,7 @@ const Chat = () =>
                 <div className="chat-message">
                     <img src={avatar} alt='avatar'  className="user-avatar"/>
                         <div className="chat-texts">
-                            <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.
+                            <p className="sender-text">quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.
                                 
                             </p>
                             <span>1 min ago</span>
@@ -54,27 +60,29 @@ const Chat = () =>
                 <div className="chat-message own">
                         <div className="chat-texts">
                             <img src="https://picsum.photos/200/300" className='sender-image'/>
-                            <p className="own-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
+                            <p className="own-text">Hello</p>
                             <span>1 min ago</span>
                         </div>
                 </div>
                 <div className="chat-message">
                     <img src={avatar} alt='avatar' className="user-avatar"/>
                         <div className="chat-texts">
-                            <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
+                            <p className="sender-text">Heyy</p>
                             <span>1 min ago</span>
                         </div>
                 </div>
                 <div className="chat-message own">
                         <div className="chat-texts">
-                            <p className="own-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
+                            <p className="own-text">How are You??</p>
                             <span>1 min ago</span>
                         </div>
                 </div>
                 <div className="chat-message">
                     <img src={avatar} alt='avatar' className="user-avatar"/>
                         <div className="chat-texts">
-                            <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
+                            <p className="sender-text">I am Good</p>
+                            <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim, molestias iusto </p>
+                            <p className="sender-text">Lorem ipsum dolor sit amee </p>
                             <span>1 min ago</span>
                         </div>
                 </div>
@@ -86,6 +94,8 @@ const Chat = () =>
                 </div>
             </div>
             {/* Center class ends */}
+
+            <div ref={endRef}></div>
 
             {/* bottom class starts */}
             <div className="bottom">
