@@ -61,6 +61,7 @@ const Chat = () =>
                         <div className="chat-texts">
                             <img src="https://picsum.photos/200/300" className='sender-image'/>
                             <p className="own-text">Hello</p>
+                            <p className="own-text">Hello ghdskj dskbsjsfs</p>
                             <span>1 min ago</span>
                         </div>
                 </div>
@@ -80,6 +81,7 @@ const Chat = () =>
                 <div className="chat-message">
                     <img src={avatar} alt='avatar' className="user-avatar"/>
                         <div className="chat-texts">
+                        <img src="https://picsum.photos/200/300" className='sender-image'/>
                             <p className="sender-text">I am Good</p>
                             <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim, molestias iusto </p>
                             <p className="sender-text">Lorem ipsum dolor sit amee </p>
@@ -89,6 +91,23 @@ const Chat = () =>
                 <div className="chat-message own">
                         <div className="chat-texts">
                             <p className="own-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
+                            <span>1 min ago</span>
+                        </div>
+                </div>
+
+                <div className="chat-message">
+                    <img src={avatar} alt='avatar' className="user-avatar"/>
+                        <div className="chat-texts">
+                            <p className="sender-text">I am Good</p>
+                            <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim, molestias iusto </p>
+                            <p className="sender-text">Lorem ipsum dolor sit amee Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam unde qui at cupiditate ut eos accusamus magnam minus nisi cumque! Totam quidem ratione fugit iure repudiandae eos officia rerum perferendis. </p>
+                            <span>1 min ago</span>
+                        </div>
+                </div>
+
+                <div className="chat-message own">
+                        <div className="chat-texts">
+                            <p className="own-text">GoodGoodGoodGoodGood</p>
                             <span>1 min ago</span>
                         </div>
                 </div>
