@@ -83,6 +83,7 @@
 
 .sender-text
 {
+    width: fit-content;
     background-color: #2094FF;
     color: #F2F2F2;
     border-radius: 10px;
@@ -91,6 +92,7 @@
 
 .own-text
 {
+    width: fit-content;
     background-color: #377EC0;
     color: #F2F2F2;
     border-radius: 10px;
@@ -180,7 +182,7 @@ font-size: 16px;
 .sender-image
 {
     height: 300px;
-    width: 100%;
+    width: 300px;
     border: 10px;
     object-fit: cover;
 }
