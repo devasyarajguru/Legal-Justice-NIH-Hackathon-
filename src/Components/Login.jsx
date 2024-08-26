@@ -4,46 +4,38 @@ const Login = () =>
     {
         return (
             <>
-            <section className="login">
-
-    <main>
-       <div class="left-side"></div>
-      
-      <div class="right-side">
-        <form>
-        <div class="btn-group">
-          <button class="btn">
-            <img class="logo" src="https://github.com/ecemgo/mini-samples-great-tricks/assets/13468728/d1c98974-c62d-4071-8bd2-ab859fc5f4e9" alt="" />
-            <span>Sign in with Google</span>
-          </button>
-          <button class="btn">
-            <img class="logo" src="https://github.com/ecemgo/mini-samples-great-tricks/assets/13468728/59c1561b-8152-4d05-b617-0680a7629a0e" alt="" />
-            <span>Sign in with Apple</span>
-          </button>
+                <section className="form-section">
+    <div className="container">
+        <div className="row no-gutters">
+            <div className="col-left">
+                <img src={LoginForm} className="img-fluid" alt="login form image" />
+            </div>
+            <div className="col-right">
+                <h1 className="header-text">Welcome To LegalHelpOffice</h1>
+                <h4>Sign into your account</h4>
+                <form id="loginForm" method="POST">
+                    <div className="form-row">
+                        <div className="form-group">
+                            <input type="email" name="mobile" placeholder="Email address" id="EmailInput" className="form-control" required />
+                            <div id="EmailError" className="error-message"></div>
+                        </div>
+                        <div className="form-group">
+                            <input type="password" name="password" placeholder="Password" id="passwordInput" className="form-control" required />
+                            <div id="passwordError" className="error-message"></div>
+                        </div>
+                        <div className="form-group">
+                            <button id="loginbtn" className="btn" aria-pressed="true"> <span>Login</span></button>
+                            <div className="signup-container">
+                                <p className="message">Don't have an account?</p>
+                                <button className="signup-button"><a href="../files/signup.html">Sign Up Now </a></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <div class="or">OR</div>
-
-        <label for="email">Email</label>
-        <input type="text" placeholder="Enter Email" name="email" required />
-
-        <label for="password">Password</label>
-        <input
-          type="password"
-          placeholder="Enter Password"
-          name="password"
-          required />
-
-        <button type="submit" class="login-btn">Sign in</button>
-        <div class="links">
-          <a href="#">Forgot password?</a>
-          <a href="#">Do not have an account?</a>
-        </div>
-      </form>
-      </div>
-      
-    </main>
-    </section>
+    </div>
+</section>
             </>
         )
     }
