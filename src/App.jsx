@@ -6,6 +6,7 @@ import Interface from './Components/Interface';
 import Chatbot from './Components/Chatbot';
 import Awareness from './Components/Awareness';
 import Login from './Components/Login';
+import SignUp from './Components/SignUp';
 
 function App() {
 
@@ -20,7 +21,8 @@ function App() {
         <Route path='/interface' element={<Interface />} />
         <Route path='/chatbot' element={<Chatbot />} />
         <Route path='/awareness' element={<Awareness />} />
-        <Route path='login' element={<Login />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/signup' element={<SignUp />} />
       </Routes>
       </div>
     </div>
