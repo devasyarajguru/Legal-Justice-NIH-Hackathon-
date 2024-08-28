@@ -9,8 +9,7 @@ const Interface = () =>
         const user = false
         return (
             <>
-            <div className="main-interface">
-               
+            <div className="main-interface">  
                 {
                     user ? 
                 (
@@ -20,7 +19,13 @@ const Interface = () =>
                     <Detail />
                     </>
                 ) 
-                    : (<Login/>)
+                    : (
+                        <>
+                        <div className='login-wrapper'>
+                            <Login/>
+                        </div>
+                    </>
+                )
                 }
                
             </div>
