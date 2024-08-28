@@ -1,0 +1,113 @@
+.sign-up-body{
+    font-family: 'Open Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 30px;
+}
+
+.main-signup-container{
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    width: 100%;
+}
+
+.form{
+    padding: 30px 40px;
+}
+
+.form h2
+{
+    text-align: center;
+    font-size: 1.7rem;
+}
+
+.form-control{
+    margin-bottom: 10px;
+    padding-bottom: 20px;
+    position: relative;
+    border: none;
+}
+
+.form-control span
+{
+    margin-right: 10px;
+}
+
+
+.file-handling
+{
+    display: flex;
+    align-items: center;
+}
+
+.form-control label{
+    color:#777;
+    display: block;
+    margin-bottom: 5px; 
+}
+ 
+.form-control input
+{
+    border: 2px solid #f0f0f0;
+    border-radius: 4px;
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;   
+}
+
+.form-control img
+{
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+
+#photo
+{
+    border: none;
+}
+
+.form-control input:focus{
+    outline: 0;
+    border-color: #777;
+}
+
+.form-control.error input
+{
+    border-color: red;
+}
+.form-control.success input
+{
+    border-color: green;
+}
+
+.form-control small{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    color: red;
+    visibility: hidden;
+}
+
+.form-control.error small
+{
+    visibility: visible;
+}
+
+.form button {
+    cursor: pointer;
+    background-color: #3498db;
+    border: 2px solid #3498db;
+    border-radius: 4px;
+    color: #fff;
+    display: block;
+    padding: 10px;
+    font-size: 16px;
+    margin-top:20px;
+    width:100%;
+}
