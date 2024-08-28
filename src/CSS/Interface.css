@@ -1,7 +1,17 @@
 .main-interface{
   display: flex;
-  max-width: 1380px;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  margin: 0 auto;
+  height: 100vh;
+}
+
+.login-wrapper
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0 1rem;
 }
 
