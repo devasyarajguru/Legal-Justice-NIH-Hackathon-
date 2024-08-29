@@ -3,6 +3,7 @@ import Chat from './chat/Chat';
 import Detail from './detail/Detail';
 import List from './list/List';
 import Login from '../Components/Login'
+import Notification from '../Components/Notification'
 
 const Interface = () =>
     {
@@ -27,7 +28,7 @@ const Interface = () =>
                     </>
                 )
                 }
-               
+                <Notification />
             </div>
             </>
         )
