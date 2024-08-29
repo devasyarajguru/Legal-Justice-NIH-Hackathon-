@@ -1,8 +1,16 @@
+import { toast } from 'react-toastify'
 import '../CSS/Login.css'
 import LoginForm from '../assets/loginform2.jpg'
 import { Link } from 'react-router-dom'
 const Login = () =>
     {
+        // Handling the Login form after submission
+        const handleLogin = e =>
+        {
+            e.preventDefault()
+            toast.success("Success")
+        }
+
         return (
             <>
             {/* Login container starts */}
@@ -18,7 +26,8 @@ const Login = () =>
                         <div className="col-right">
                             <h1 className="header-text">Welcome To Legal Help Office</h1>
                             <h4>Sign into your account</h4>
-                            <form id="loginForm" method="POST">
+                            {/* Form starts */}
+                            <form id="loginForm" onSubmit={handleLogin}>
                                 <div className="form-row">
                                     <div className="form-group">
                                         <input type="email" name="email" placeholder="Email address" id="EmailInput" className="form-control" required />
@@ -37,6 +46,8 @@ const Login = () =>
                                     </div>
                                 </div>
                             </form>
+                            {/* Form ends */}
+
                         </div>
                         </div>
                     </div>
