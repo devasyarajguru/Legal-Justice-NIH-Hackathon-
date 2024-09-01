@@ -40,7 +40,7 @@ const SignUp = () =>
         });
 
 
-        // Handling errors
+        // Storing errors
         const [errors,setErrors] = useState({});
 
 
@@ -51,7 +51,7 @@ const SignUp = () =>
 
             if(!formData.username.trim())
             {
-                newErrors.username = "Username is required"
+                newErrors.username = "Username is required"   // Object newErros creates key of username
             }
 
             else if (formData.username.length > 20) {
@@ -59,7 +59,7 @@ const SignUp = () =>
             }
 
             if (!formData.email.trim()) {
-                newErrors.email = "Email is required";
+                newErrors.email = "Email is required"; // Object newErros creates key of email
             }
 
             else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
