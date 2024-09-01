@@ -2,8 +2,38 @@ import { toast } from 'react-toastify'
 import '../CSS/Login.css'
 import LoginForm from '../assets/loginform2.jpg'
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 const Login = () =>
     {
+        // Handling the form Data
+        const[loginData,setLoginData] = useState({
+            email:'',
+            password:''
+        })
+
+        // Storing errors
+        const[errors,setErrors] = useState({})
+        
+        // Validating the form
+
+        {/* -----------INCOMPLETE -------------- */}
+        
+        const validateForm = () =>
+        {
+            const newErrors = {};
+            if(!loginData.email.trim())
+            {
+                newErrors.email = "Email is required"
+            }
+
+            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginData.email))
+            {
+                newErrors.email = "Email is not valid"
+            }
+
+
+        }
+
         // Handling the Login form after submission
         const handleLogin = e =>
         {
@@ -30,11 +60,18 @@ const Login = () =>
                             <form id="loginForm" onSubmit={handleLogin}>
                                 <div className="form-row">
                                     <div className="form-group">
-                                        <input type="email" name="email" placeholder="Email address" id="EmailInput" className="form-control" required />
+                                        <input 
+                                        type="email" 
+                                        name="email" 
+                                        placeholder="Email address" 
+                                        id="EmailInput" 
+                                        className="form-control" 
+                                        value={loginData.email} />
                                     <div id="EmailError" className="error-message"></div>
                                     </div>
                                     <div className="form-group">
-                                        <input type="password" name="password" placeholder="Password" id="passwordInput" className="form-control" required />
+                                        <input type="password" name="password" placeholder="Password" id="passwordInput" className="form-control" 
+                                        value={loginData.password} />
                                     <div id="passwordError" className="error-message"></div>
                                     </div>
                                     <div className="form-group">
