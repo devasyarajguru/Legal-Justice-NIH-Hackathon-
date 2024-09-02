@@ -107,16 +107,20 @@ const SignUp = () =>
         // Handling the form after submission
         const handleSubmit = (e) =>
             {
-                e.preventDefault()
+                e.preventDefault(e.target)
+
+                const formData = new FormData(e.target);  // FormData constructor which gathers the key/value pairs from the form for eg. username , email and password
+
+               
+                const {username , email, password} = Object.fromEntries(formData);   // It is a method that transforms a list of key-value pairs into an Object. In Object keys are the form field names and the values are form field values
+
+                console.log(username,email, password)
+
                 if(validateForm())
                 {
                     toast.success("Form Submitted successfully!")
                 }
 
-                // else
-                // {
-                //     toast.error("Please fix your errors!")
-                // }
             }    
 
 
