@@ -4,6 +4,10 @@ import '../CSS/SignUp.css'
 import myAvatar from "../assets/avatar.png"
 import { toast } from 'react-toastify';
 import Notification from '../Components/Notification'
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {auth,db} from './lib/firebase'
+import { doc, setDoc } from "firebase/firestore"; 
+
 
 
 const SignUp = () =>
@@ -105,16 +109,36 @@ const SignUp = () =>
 
 
         // Handling the form after submission
-        const handleSubmit = (e) =>
+        const handleSubmit = async (e) =>
             {
                 e.preventDefault(e.target)
 
                 const formData = new FormData(e.target);  // FormData constructor which gathers the key/value pairs from the form for eg. username , email and password
 
-               
                 const {username , email, password} = Object.fromEntries(formData);   // It is a method that transforms a list of key-value pairs into an Object. In Object keys are the form field names and the values are form field values
 
-                console.log(username,email, password)
+                try 
+                {
+                    const res = await createUserWithEmailAndPassword(auth,email,password)
+
+                        // Add a new document in collection "users"
+                    await setDoc(doc(db, "users", res.user.uid), {
+                        username,
+                        email,
+                        password,
+                        blocked:[]
+                    });
+
+                    await setDoc(doc(db, "userchats", res.user.uid), {
+                        chats:[]
+                    });
+
+                }
+                catch(error)
+                {
+                    console.log(error);
+                    toast.error(error.message)
+                }
 
                 if(validateForm())
                 {
