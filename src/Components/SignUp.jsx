@@ -7,6 +7,7 @@ import Notification from '../Components/Notification'
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import {auth,db} from './lib/firebase'
 import { doc, setDoc } from "firebase/firestore"; 
+import upload from './lib/upload';
 
 
 
@@ -121,10 +122,13 @@ const SignUp = () =>
                 {
                     const res = await createUserWithEmailAndPassword(auth,email,password)
 
+                    const imgURL = await upload(avatar.file)
+
                         // Add a new document in collection "users"
                     await setDoc(doc(db, "users", res.user.uid), {
                         username,
                         email,
+                        avatar:imgURL,
                         password,
                         blocked:[]
                     });
@@ -132,7 +136,7 @@ const SignUp = () =>
                     await setDoc(doc(db, "userchats", res.user.uid), {
                         chats:[]
                     });
-
+         
                 }
                 catch(error)
                 {
