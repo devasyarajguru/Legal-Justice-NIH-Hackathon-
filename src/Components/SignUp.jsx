@@ -13,6 +13,9 @@ import upload from './lib/upload';
 
 const SignUp = () =>
     {
+        // Loading symbol when submitted
+        const [loading,setLoading] = useState(false)
+
         // Setting Avatar state with file selection and URl to display
         const[avatar,setAvatar] = useState(
             {
@@ -114,15 +117,17 @@ const SignUp = () =>
             {
                 e.preventDefault(e.target)
 
+                setLoading(true);
+
                 const formData = new FormData(e.target);  // FormData constructor which gathers the key/value pairs from the form for eg. username , email and password
 
                 const {username , email, password} = Object.fromEntries(formData);   // It is a method that transforms a list of key-value pairs into an Object. In Object keys are the form field names and the values are form field values
 
                 try 
                 {
-                    const res = await createUserWithEmailAndPassword(auth,email,password)
+                    const res = await createUserWithEmailAndPassword(auth,email,password) // Creating user with email and password
 
-                    const imgURL = await upload(avatar.file)
+                    const imgURL = await upload(avatar.file) // uploading image to the firebase. The image is which we have choosen for avatar image
 
                         // Add a new document in collection "users"
                     await setDoc(doc(db, "users", res.user.uid), {
@@ -133,6 +138,7 @@ const SignUp = () =>
                         blocked:[]
                     });
 
+                    // Add a new document in collection "userChats"
                     await setDoc(doc(db, "userchats", res.user.uid), {
                         chats:[]
                     });
@@ -142,6 +148,11 @@ const SignUp = () =>
                 {
                     console.log(error);
                     toast.error(error.message)
+                }
+
+                finally
+                {
+                    setLoading(false)
                 }
 
                 if(validateForm())
@@ -209,7 +220,7 @@ const SignUp = () =>
                        {errors.password && <small className="error-message">{errors.password}</small>}
                     </div>
                     {/* {successMessage && <div className="success-message">{successMessage}</div>} */}
-                    <button>Submit</button>
+                    <button disabled={loading}>{loading ? "Loading" : "Submit"}</button>
                 </form>
                 {/* Form ends */}
 
