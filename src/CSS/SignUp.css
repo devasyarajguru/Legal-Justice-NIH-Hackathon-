@@ -114,4 +114,10 @@
     font-size: 16px;
     margin-top:20px;
     width:100%;
+
+    &:disabled
+    {
+        cursor: not-allowed;
+        background-color: #3498db8a;
+    }
 }
