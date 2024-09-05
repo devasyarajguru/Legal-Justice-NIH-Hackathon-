@@ -3,6 +3,7 @@ import '../CSS/Login.css'
 import LoginForm from '../assets/loginform2.jpg'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import { signInWithEmailAndPassword } from 'firebase/auth';
 const Login = () =>
     {
         // Handling the form Data
@@ -35,10 +36,19 @@ const Login = () =>
         }
 
         // Handling the Login form after submission
-        const handleLogin = e =>
+        const handleLogin = async (e) =>
         {
             e.preventDefault()
-            toast.success("Success")
+            
+            try
+            {
+
+            }
+            catch(err)
+            {
+                console.log(err)
+                toast.error(err.message)
+            }
         }
 
         return (
