@@ -220,7 +220,7 @@ const SignUp = () =>
                        {errors.password && <small className="error-message">{errors.password}</small>}
                     </div>
                     {/* {successMessage && <div className="success-message">{successMessage}</div>} */}
-                    <button disabled={loading}>{loading ? "Loading" : "Submit"}</button>
+                    <button disabled={loading}>{loading ? "Loading..." : "Submit"}</button>
                 </form>
                 {/* Form ends */}
 
