@@ -3,7 +3,11 @@ import '../CSS/Login.css'
 import LoginForm from '../assets/loginform2.jpg'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import {auth,db} from './lib/firebase'
+import { doc, setDoc } from "firebase/firestore"; 
 import { signInWithEmailAndPassword } from 'firebase/auth';
+
+// Login form email and password input fields not typeable - Error
 const Login = () =>
     {
         // Handling the form Data
@@ -11,6 +15,9 @@ const Login = () =>
             email:'',
             password:''
         })
+
+        // Setting the loading state
+        const[loading,setLoading] = useState(false)
 
         // Storing errors
         const[errors,setErrors] = useState({})
@@ -39,16 +46,34 @@ const Login = () =>
         const handleLogin = async (e) =>
         {
             e.preventDefault()
+            setLoading(true);
+
+            const loginData = new FormData(e.target);
+
+            const {email , password} = Object.fromEntries(loginData)
             
             try
             {
-
+                await signInWithEmailAndPassword(auth,email,password)
             }
             catch(err)
             {
                 console.log(err)
                 toast.error(err.message)
             }
+
+            finally
+            {
+                setLoading(false)
+            }
+        }
+
+        // Handling the change values in form
+        const handleChange = e =>
+        {
+            setLoginData({...loginData,
+                [e.target.name]:e.target.value
+            })
         }
 
         return (
@@ -76,16 +101,18 @@ const Login = () =>
                                         placeholder="Email address" 
                                         id="EmailInput" 
                                         className="form-control" 
-                                        value={loginData.email} />
+                                        value={loginData.email}
+                                        onChange={handleChange} />
                                     <div id="EmailError" className="error-message"></div>
                                     </div>
                                     <div className="form-group">
                                         <input type="password" name="password" placeholder="Password" id="passwordInput" className="form-control" 
-                                        value={loginData.password} />
+                                        value={loginData.password}
+                                        onChange={handleChange} />
                                     <div id="passwordError" className="error-message"></div>
                                     </div>
                                     <div className="form-group">
-                                    <button id="loginbtn" className="btn" aria-pressed="true"> <span>Login</span></button>
+                                    <button id="loginbtn" className="btn" aria-pressed="true" disabled={loading}> <span>{loading ? "Loading..." : "Login"}</span></button>
                                     <div className="signup-container">
                                         <p className="message">Don't have an account?</p>
                                         <Link to="/signup"><button className="signup-button">Sign Up Now</button></Link>
