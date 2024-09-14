@@ -7,7 +7,7 @@ import Notification from '../Components/Notification'
 
 const Interface = () =>
     {
-        const user = true
+        const user = false
         return (
             <>
             <div className="main-interface">  
