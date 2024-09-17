@@ -113,47 +113,47 @@ const SignUp = () =>
 
 
         // Handling the form after submission
-        const handleSubmit = async (e) =>
-            {
-                e.preventDefault(e.target)
-
-                setLoading(true);
-
-                const formData = new FormData(e.target);  // FormData constructor which gathers the key/value pairs from the form for eg. username , email and password
-
-                const {username , email, password} = Object.fromEntries(formData);   // It is a method that transforms a list of key-value pairs into an Object. In Object keys are the form field names and the values are form field values
-
-                try 
+            const handleSubmit = async (e) =>
                 {
-                    const res = await createUserWithEmailAndPassword(auth,email,password) // Creating user with email and password
+                    e.preventDefault(e.target)
 
-                    const imgURL = await upload(avatar.file) // uploading image to the firebase. The image is which we have choosen for avatar image
+                    setLoading(true);
 
-                        // Add a new document in collection "users"
-                    await setDoc(doc(db, "users", res.user.uid), {
-                        username,
-                        email,
-                        avatar:imgURL,
-                        password,
-                        blocked:[]
-                    });
+                    const formData = new FormData(e.target);  // FormData constructor which gathers the key/value pairs from the form for eg. username , email and password
 
-                    // Add a new document in collection "userChats"
-                    await setDoc(doc(db, "userchats", res.user.uid), {
-                        chats:[]
-                    });
-         
-                }
-                catch(error)
-                {
-                    console.log(error);
-                    toast.error(error.message)
-                }
+                    const {username , email, password} = Object.fromEntries(formData);   // It is a method that transforms a list of key-value pairs into an Object. In Object keys are the form field names and the values are form field values
 
-                finally
-                {
-                    setLoading(false)
-                }
+                    try 
+                    {
+                        const res = await createUserWithEmailAndPassword(auth,email,password) // Creating user with email and password
+
+                        const imgURL = await upload(avatar.file) // uploading image to the firebase. The image is which we have choosen for avatar image
+
+                            // Add a new document in collection "users"
+                        await setDoc(doc(db, "users", res.user.uid), {
+                            username,
+                            email,
+                            avatar:imgURL,
+                            password,
+                            blocked:[]
+                        });
+
+                        // Add a new document in collection "userChats"
+                        await setDoc(doc(db, "userchats", res.user.uid), {
+                            chats:[]
+                        });
+            
+                    }
+                    catch(error)
+                    {
+                        console.log(error);
+                        toast.error(error.message)
+                    }
+
+                    finally
+                    {
+                        setLoading(false)
+                    }
 
                 if(validateForm())
                 {
