@@ -7,7 +7,7 @@ import {auth,db} from './lib/firebase'
 import { doc, setDoc } from "firebase/firestore"; 
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
-// Login form email and password input fields not typeable - Error
+// 1:47:57
 const Login = () =>
     {
         // Handling the form Data
@@ -48,9 +48,7 @@ const Login = () =>
             e.preventDefault()
             setLoading(true);
 
-            const loginData = new FormData(e.target);
-
-            const {email , password} = Object.fromEntries(loginData)
+            const { email, password } = loginData;
             
             try
             {
