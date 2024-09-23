@@ -3,8 +3,8 @@ import '../CSS/Login.css'
 import LoginForm from '../assets/loginform2.jpg'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import {auth,db} from './lib/firebase'
-import { doc, setDoc } from "firebase/firestore"; 
+import {auth} from './lib/firebase'
+// import { doc, setDoc } from "firebase/firestore"; 
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
 // 1:47:57
@@ -49,14 +49,18 @@ const Login = () =>
             setLoading(true);
 
             const { email, password } = loginData;
+
+            console.log("Attempting login with:", email, password);
             
             try
             {
-                await signInWithEmailAndPassword(auth,email,password)
+                const userCredential =  await signInWithEmailAndPassword(auth,email,password)
+                toast.success("Successful!")
+                console.log("Logged in user:",userCredential.user)
             }
             catch(err)
             {
-                console.log(err)
+                console.log("Login error:",err)
                 toast.error(err.message)
             }
 
