@@ -7,7 +7,7 @@ import {auth} from './lib/firebase'
 // import { doc, setDoc } from "firebase/firestore"; 
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
-// 1:47:57
+// 1:56:21
 const Login = () =>
     {
         // Handling the form Data
