@@ -50,13 +50,10 @@ const Login = () =>
 
             const { email, password } = loginData;
 
-            console.log("Attempting login with:", email, password);
-            
             try
             {
                 const userCredential =  await signInWithEmailAndPassword(auth,email,password)
                 toast.success("Successful!")
-                console.log("Logged in user:",userCredential.user)
             }
             catch(err)
             {
