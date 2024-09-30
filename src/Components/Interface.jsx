@@ -7,11 +7,12 @@ import Notification from '../Components/Notification'
 import { useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import {auth} from './lib/firebase'
+import { userStore } from './lib/myStore';
 
 
 const Interface = () =>
     {
-        const user = false
+        const {currentUser , isLoading , fetchUserInfo} = userStore()
 
         useEffect(() =>
         {
@@ -25,6 +26,8 @@ const Interface = () =>
                 unSub(); // returns this function so that onAuthStateChanged is unsubscribed , when the component unmounts avoiding potential memory leaks from keeping unused listeners active.
             };
         },[])
+
+        if (isLoading) return <div></div>
 
         return (
             <>
