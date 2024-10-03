@@ -1,6 +1,7 @@
 import { doc, getDoc } from "firebase/firestore";
 import { create } from "zustand";
 
+
  export const userStore = create((set) => (
 {
     currentUser:null,  // this will store the current user's data fetched from the firestore
