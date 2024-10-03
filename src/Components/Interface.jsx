@@ -18,7 +18,7 @@ const Interface = () =>
         {
             const unSub = onAuthStateChanged(auth,(user)=> // onAuthStateChanged is a Firebase Auth listener that checks the current authentication state (whether a user is logged in or not)
             {
-                fetchUserInfo(user.uid)
+                fetchUserInfo(user ? user.uid: null);
             })
 
             return () =>
