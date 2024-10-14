@@ -2,6 +2,7 @@ import './detail.css'
 import avatar from './assets/avatar.png';
 import mail from './assets/mail.png'; 
 import download from './assets/download.png'; 
+import { auth } from '../lib/firebase';
 // import call from './assets/call.png'; 
 // import video from './assets/video.png'; 
 
@@ -95,7 +96,7 @@ const Detail = () =>
                     {/* option class ends */}
                         <div className='buttonClass'>
                             <button className='block-button'>Block User</button>
-                            <button className='logout-btn'>Log Out</button>
+                            <button className='logout-btn' onClick={() => auth.signOut()}>Log Out</button>
                         </div>
                 </div>
                 {/* Info class ends */}
