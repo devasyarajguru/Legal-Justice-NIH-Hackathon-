@@ -3,15 +3,52 @@ import searchImg from './assets/search.png';
 import plusImg from './assets/plus.png';
 import minusImg from './assets/minus.png';
 import avatar from '../userinfo/assets/avatar.png';
-
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useUserStore } from '../../lib/userStore';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 
 
 const ChatList = () =>
     {
-        
+        const [chats, setChats] = useState([])
         const [addMode , setaddMode] = useState(false);
         const [searchItem, setSearchItem] = useState("");
+
+        const {currentUser} = useUserStore();
+
+        // Getting the chat list of the current user
+        useEffect(() =>
+        {
+            if(currentUser && currentUser.id)
+            {
+                const unSub = onSnapshot(doc(db, "userchats", currentUser.id), (doc) => {
+                    if(doc.exists())
+                    {
+                        setChats(doc.data());
+                    }
+
+                    else
+                    {
+                        console.log("No such Document!")
+                        setChats({});
+                    }
+                    
+                } , (error) =>
+                {
+                    console.log("Error while fetching details" , error)
+                });
+            
+            return () =>
+            {
+                unSub()
+            }
+
+        }
+
+        },[currentUser.id])
+
+        console.log(chats)
 
         // Example list of chat items with names
     const chatItems = [
