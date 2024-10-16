@@ -59,7 +59,7 @@ const SignUp = () =>
 
             if(!formData.username.trim())
             {
-                newErrors.username = "Username is required"   // Object newErros creates key of username
+                newErrors.username = "Username is required"   
             }
 
             else if (formData.username.length > 20) {
@@ -67,7 +67,7 @@ const SignUp = () =>
             }
 
             if (!formData.email.trim()) {
-                newErrors.email = "Email is required"; // Object newErros creates key of email
+                newErrors.email = "Email is required"; 
             }
 
             else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
@@ -129,7 +129,7 @@ const SignUp = () =>
 
                         const imgURL = await upload(avatar.file) // uploading image to the firebase. The image is which we have choosen for avatar image
 
-                            // Add a new document in collection "users"
+                            // Add a new document in collection "users" , all the values
                         await setDoc(doc(db, "users", res.user.uid), {
                             username,
                             email,
