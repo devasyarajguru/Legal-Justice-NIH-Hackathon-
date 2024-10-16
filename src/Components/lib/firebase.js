@@ -18,6 +18,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app);
 
+// Getting the auth , db storage from firebase
 export const auth = getAuth()
 export const db = getFirestore()
 export const storage = getStorage()
