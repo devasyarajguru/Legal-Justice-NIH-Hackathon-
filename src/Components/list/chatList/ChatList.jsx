@@ -8,6 +8,7 @@ import { useUserStore } from '../../lib/userStore';
 import { doc, onSnapshot , getDoc} from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 
+
 // 2:14:20
 const ChatList = () =>
     {
@@ -119,7 +120,6 @@ const ChatList = () =>
                 ))}
 
                 {/* Chat item ends*/}
-            
                 
             </div>
             // chatList main container ends
