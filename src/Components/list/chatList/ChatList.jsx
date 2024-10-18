@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useUserStore } from '../../lib/userStore';
 import { doc, onSnapshot , getDoc} from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import NewUser from './newUser/NewUser'
 
 
 // 2:14:20
@@ -120,7 +121,7 @@ const ChatList = () =>
                 ))}
 
                 {/* Chat item ends*/}
-                
+                {addMode && <NewUser />}
             </div>
             // chatList main container ends
 
