@@ -53,7 +53,7 @@ const Login = () =>
             try
             {
                 const userCredential =  await signInWithEmailAndPassword(auth,email,password)
-                toast.success("Successful!")
+                toast.success("Successful Login!")
             }
             catch(err)
             {
