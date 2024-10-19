@@ -127,7 +127,16 @@ const SignUp = () =>
                     {
                         const res = await createUserWithEmailAndPassword(auth,email,password) // Creating user with email and password
 
-                        const imgURL = await upload(avatar.file) // uploading image to the firebase. The image is which we have choosen for avatar image
+                        let imgURL = '';
+                        if (avatar && avatar.file)
+                        {
+                             imgURL = await upload(avatar.file) // uploading image to the firebase. The image is which we have choosen for avatar image
+                        }      
+
+                        else
+                        {
+                            imgURL = myAvatar;
+                        }
 
                             // Add a new document in collection "users" , all the values
                         await setDoc(doc(db, "users", res.user.uid), {
@@ -142,12 +151,13 @@ const SignUp = () =>
                         await setDoc(doc(db, "userchats", res.user.uid), {
                             chats:[]
                         });
-            
+
+                        toast.success("Signup successful")
                     }
                     catch(error)
                     {
-                        console.log(error);
-                        toast.error(error.message)
+                        console.log("Firestore error: ",error);
+                        toast.error("Error while adding user: " + error.message)
                     }
 
                     finally
