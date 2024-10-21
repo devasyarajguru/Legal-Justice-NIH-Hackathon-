@@ -1,10 +1,10 @@
-import { useState } from "react";
+    import { useState } from "react";
 import avatar from "../../../../assets/avatar.png"
 import { db } from "../../../lib/firebase";
 import "./NewUser.css"
 import { collection, getDocs, query, where , setDoc , doc} from "firebase/firestore";
 
-// 2:18:46
+// 2:18:46 
 const NewUser = () =>
 {
     const [user,setUser] = useState(null) // storing the user data when a search result is found
@@ -21,7 +21,7 @@ const NewUser = () =>
            try
            {
             // users collectin reference
-            const userRef = collection(db, "users");
+            const userRef = collection(db, "usernames");
             const q = query(userRef, where("username", "==", username)); // creating a firestore query to find a user whose username matches the one provided in the form
 
             const querySnapShot = await getDocs(q) // executing the query and fetches matching documents from Firestore
@@ -40,7 +40,7 @@ const NewUser = () =>
 
            catch(err)
            {
-            console.log(err)
+            console.log("Error while searching:" , err)
            }
         }
 
