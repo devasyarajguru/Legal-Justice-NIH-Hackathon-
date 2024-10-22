@@ -1,8 +1,8 @@
-    import { useState } from "react";
+import { useState } from "react";
 import avatar from "../../../../assets/avatar.png"
 import { db } from "../../../lib/firebase";
 import "./NewUser.css"
-import { collection, getDocs, query, where , setDoc , doc} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 // 2:18:46 
 const NewUser = () =>
@@ -21,20 +21,14 @@ const NewUser = () =>
            try
            {
             // users collectin reference
-            const userRef = collection(db, "usernames");
+            const userRef = collection(db, "users");
             const q = query(userRef, where("username", "==", username)); // creating a firestore query to find a user whose username matches the one provided in the form
 
             const querySnapShot = await getDocs(q) // executing the query and fetches matching documents from Firestore
-            console.log(querySnapShot)
 
             if(!querySnapShot.empty)
             {
-                // docs is an array that contains each document returned from the query
-                // setUser(querySnapShot.docs[0].data())
-                const foundUser = querySnapShot.docs[0].data();
-                setUser(foundUser);
-
-                await addUsername(foundUser.userId , foundUser.username , foundUser.avatar)
+                setUser(querySnapShot.docs[0].data()) // querySnapshot.docs is an array of document snapshots , since docs[0] for first value extracted by data()
             }
            }
 
@@ -45,25 +39,25 @@ const NewUser = () =>
         }
 
         // Function to add username to the usernames collection
-        const addUsername = async (userId , username ,avatarURL) =>
-        {
-            try
-            {
-                const userDocRef = doc(collection(db , "usernames") , userId);
+        // const addUsername = async (userId , username ,avatarURL) =>
+        // {
+        //     try
+        //     {
+        //         const userDocRef = doc(collection(db , "usernames") , userId);
 
-                await setDoc(userDocRef , {
-                    userId:userId,
-                    username:username,
-                    avatar:avatarURL
-                });
-                console.log("Username added")
-            }
+        //         await setDoc(userDocRef , {
+        //             userId:userId,
+        //             username:username,
+        //             avatar:avatarURL
+        //         });
+        //         console.log("Username added")
+        //     }
 
-            catch(error)
-            {
-                console.error("Error adding username",error);
-            }
-        }
+        //     catch(error)
+        //     {
+        //         console.error("Error adding username",error);
+        //     }
+        // }
     return(
         <>
             <div className="addUser">
