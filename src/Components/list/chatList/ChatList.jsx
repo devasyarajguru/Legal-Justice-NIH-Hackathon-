@@ -39,13 +39,9 @@ const ChatList = () =>
                             "chats": [
                               {
                                 "receiverID": "user1",
-                                "lastMessage": "Hello!",
-                                "timestamp": "2024-10-15T12:00:00"
                               },
                               {
                                 "receiverID": "user2",
-                                "lastMessage": "How are you?",
-                                "timestamp": "2024-10-15T14:30:00"
                               }, */
 
                         // use of promise to fetch data of each chat conversations of authenticated users by receiver id 
