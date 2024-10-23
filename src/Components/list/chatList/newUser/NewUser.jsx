@@ -2,13 +2,15 @@ import { useState } from "react";
 import avatar from "../../../../assets/avatar.png"
 import { db } from "../../../lib/firebase";
 import "./NewUser.css"
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { arrayUnion, collection, doc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
+import { useUserStore } from "../../../lib/userStore";
 
 // 2:18:46 
 const NewUser = () =>
 {
     const [user,setUser] = useState(null) // storing the user data when a search result is found
 
+    const {currentUser} = useUserStore() // current user from UserStore
 
     // Handling the searched users
     const handleSearch = async e =>
@@ -38,26 +40,52 @@ const NewUser = () =>
            }
         }
 
-        // Function to add username to the usernames collection
-        // const addUsername = async (userId , username ,avatarURL) =>
-        // {
-        //     try
-        //     {
-        //         const userDocRef = doc(collection(db , "usernames") , userId);
+        // function add user while searching username
+        const handleAdd =  async (e) =>
+        {
+            e.preventDefault()
+            const chatRef = collection(db, "chats"); // Assigning Collection chats
+            const userChatsRef = collection(db,"userchats"); // Assigning Collection userchats
 
-        //         await setDoc(userDocRef , {
-        //             userId:userId,
-        //             username:username,
-        //             avatar:avatarURL
-        //         });
-        //         console.log("Username added")
-        //     }
+            try
+            {
+                const newchatRef = doc(chatRef) // Refering to the "chats" documnet
+                await setDoc(newchatRef,  // Setting the values in doc
+                    {
+                        createdAt: serverTimestamp(), // to include a server-generated timestamp in the written data
+                        messages:[]
+                    }  
+                )   
 
-        //     catch(error)
-        //     {
-        //         console.error("Error adding username",error);
-        //     }
-        // }
+                // Updating userchats collection
+                await updateDoc(doc(userChatsRef , user.id) , 
+                {
+                chats: arrayUnion({
+                    chatId:newchatRef.id,
+                    lastMessage:"",
+                    receiverId: currentUser.id,
+                    updatedAt: Date.now()
+                })
+                })
+
+                await updateDoc(doc(userChatsRef , currentUser.id) , 
+                {
+                chats: arrayUnion({
+                    chatId:newchatRef.id,
+                    lastMessage:"",
+                    receiverId: user.id,
+                    updatedAt: Date.now()
+                })
+                })
+
+            }
+
+            catch(err)
+            {
+                console.log("Error" ,err)
+            }
+        }
+
     return(
         <>
             <div className="addUser">
@@ -71,7 +99,7 @@ const NewUser = () =>
                         <img src={user.avatar || avatar} alt="user-avatar"/>
                         <span>{user.username}</span>
                     </div>
-                    <button>Add User</button>
+                    <button onClick={handleAdd}>Add User</button>
                 </div>
                 }
                 
