@@ -47,45 +47,55 @@ const NewUser = () =>
             const chatRef = collection(db, "chats"); // Assigning Collection chats
             const userChatsRef = collection(db,"userchats"); // Assigning Collection userchats
 
-            try
+            if (currentUser.id && user.id)
             {
-                const newchatRef = doc(chatRef) // Refering to the "chats" documnet
-                await setDoc(newchatRef,  // Setting the values in doc
-                    {
-                        createdAt: serverTimestamp(), // to include a server-generated timestamp in the written data
-                        messages:[]
-                    }  
-                )   
 
-                // Updating userchats collection
-                await updateDoc(doc(userChatsRef , user.id) , 
+                try
                 {
-                chats: arrayUnion({
-                    chatId:newchatRef.id,
-                    lastMessage:"",
-                    receiverId: currentUser.id,
-                    updatedAt: Date.now()
-                })
-                })
-
-                await updateDoc(doc(userChatsRef , currentUser.id) , 
+                    const newchatRef = doc(chatRef); // Refering to the "chats" documnet
+                    await setDoc(
+                        newchatRef, // Setting the values in "chats" doc
+                        {
+                            createdAt: serverTimestamp(), // to include a server-generated timestamp in the written data
+                            messages: [], // 
+                        }
+                    );
+                    
+                    // Updating userchats collection for other user
+                    await updateDoc(doc(userChatsRef, user.id), {
+                        chats: arrayUnion({
+                            chatId: newchatRef.id,
+                            lastMessage: "",
+                            receiverId: currentUser.id,
+                            updatedAt: Date.now(),    
+                        }),
+                    });
+                    
+                    
+                    // Updating userchats collection for current user 
+                    await updateDoc(doc(userChatsRef, currentUser.id), {
+                        chats: arrayUnion({
+                            chatId: newchatRef.id,
+                            lastMessage: "",
+                            receiverId: user.id,
+                            updatedAt: Date.now(),
+                        }),
+                    });
+                    
+                }
+                
+                catch(err)
                 {
-                chats: arrayUnion({
-                    chatId:newchatRef.id,
-                    lastMessage:"",
-                    receiverId: user.id,
-                    updatedAt: Date.now()
-                })
-                })
-
+                    console.log("Error" ,err)
+                }
             }
 
-            catch(err)
+            else
             {
-                console.log("Error" ,err)
+                console.log("Error: Cant found user.id and currentuser.id")
             }
         }
-
+            
     return(
         <>
             <div className="addUser">
