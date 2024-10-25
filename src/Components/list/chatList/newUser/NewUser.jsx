@@ -30,7 +30,16 @@ const NewUser = () =>
 
             if(!querySnapShot.empty)
             {
-                setUser(querySnapShot.docs[0].data()) // querySnapshot.docs is an array of document snapshots , since docs[0] for first value extracted by data()
+                const foundUser = { ...querySnapShot.docs[0].data() , id:querySnapShot.docs[0].id}
+
+                setUser(foundUser) // querySnapshot.docs is an array of document snapshots , since docs[0] for first value extracted by data()
+
+                console.log("Searched User" , foundUser)
+            }
+
+            else
+            {
+                console.log("No user found")
             }
            }
 
@@ -40,15 +49,18 @@ const NewUser = () =>
            }
         }
 
+        console.log("CurrentUser object" , currentUser)
+        console.log("currentUser ID:",currentUser.id)
+
+
         // function add user while searching username
         const handleAdd =  async (e) =>
         {
             e.preventDefault()
+
             const chatRef = collection(db, "chats"); // Assigning Collection chats
             const userChatsRef = collection(db,"userchats"); // Assigning Collection userchats
 
-            if (currentUser.id && user.id)
-            {
 
                 try
                 {
@@ -60,6 +72,8 @@ const NewUser = () =>
                             messages: [], // 
                         }
                     );
+
+                    console.log("Chat created with ID:",newchatRef.id)
                     
                     // Updating userchats collection for other user
                     await updateDoc(doc(userChatsRef, user.id), {
@@ -81,19 +95,14 @@ const NewUser = () =>
                             updatedAt: Date.now(),
                         }),
                     });
-                    
+
+                    console.log("Userchats updated successfully.");
                 }
                 
                 catch(err)
                 {
                     console.log("Error" ,err)
                 }
-            }
-
-            else
-            {
-                console.log("Error: Cant found user.id and currentuser.id")
-            }
         }
             
     return(
