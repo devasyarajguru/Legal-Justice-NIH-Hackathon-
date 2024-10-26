@@ -5,7 +5,7 @@ import minusImg from './assets/minus.png';
 import avatar from '../userinfo/assets/avatar.png';
 import { useEffect, useState } from 'react';
 import { useUserStore } from '../../lib/userStore';
-import { doc, onSnapshot , getDoc} from 'firebase/firestore';
+import { doc, onSnapshot , getDoc, setDoc} from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import NewUser from './newUser/NewUser'
 
@@ -22,6 +22,20 @@ const ChatList = () =>
         // Getting the chat list of the current user
         useEffect(() =>
         {
+
+            const createEmptyChats = async () =>
+            {
+                try {
+                    await setDoc(doc(db , "userchats" , currentUser.id) , {chats: []});
+                    console.log("New userchats document created for:", currentUser.id);
+                }
+
+                catch(error)
+                {
+                    console.error("Error creating userchats document:" , error);
+                }
+            }
+
             // If there is current user and id exist
             if(currentUser && currentUser.id)
             {
@@ -33,7 +47,7 @@ const ChatList = () =>
                     // If the document exits
                     if(res.exists())
                     {
-                        const items = res.data().chats; // getting the chats of list of users ,eg. -  5 users 5 chats
+                        const items = res.data().chats || []; // getting the chats of list of users ,eg. -  5 users 5 chats
                     
                         /*{
                             "chats": [
@@ -63,6 +77,7 @@ const ChatList = () =>
                     else
                     {
                         console.log("No such Document!")
+                        await createEmptyChats();
                         setChats({});
                     }
                     
