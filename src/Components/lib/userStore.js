@@ -18,7 +18,7 @@ import {db} from "./firebase"
 
             if(docSnap.exists())
             {
-                set({currentUser: docSnap.data() , isLoading: false})  // In this we have got the user data so fetching process is complete , we can turn of the isLoading behaviour i.e False
+                set({currentUser: { id: docSnap.id ,...docSnap.data()} , isLoading: false})  // In this we have got the user data so fetching process is complete , we can turn of the isLoading behaviour i.e False
             }
             
             else
