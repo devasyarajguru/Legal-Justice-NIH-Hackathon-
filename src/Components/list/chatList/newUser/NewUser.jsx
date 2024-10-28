@@ -76,59 +76,6 @@ const NewUser = () =>
             
                     console.log("Chat successfully created with participants:", [currentUser.id, user.id]);
 
-
-                      // Check if userchats document for the other user exists
-        const otherUserChatsDoc = doc(userChatsRef, user.id);
-        const otherUserDocSnapshot = await getDoc(otherUserChatsDoc);
-        if (!otherUserDocSnapshot.exists()) {
-            console.log(`Userchats document for user ${user.id} does not exist.`);
-            // Optionally, you can create it if necessary
-            await setDoc(otherUserChatsDoc, { chats: [] }); // Initialize with an empty chats array
-        }
-
-        // Check if userchats document for current user exists
-        const currentUserChatsDoc = doc(userChatsRef, currentUser.id);
-        const currentUserDocSnapshot = await getDoc(currentUserChatsDoc);
-        if (!currentUserDocSnapshot.exists()) {
-            console.log(`Userchats document for current user ${currentUser.id} does not exist.`);
-            // Optionally, you can create it if necessary
-            await setDoc(currentUserChatsDoc, { chats: [] }); // Initialize with an empty chats array
-        }
-
-                    // Before updating userchats for the other user
-console.log("Updating userchats for other user ID:", user.id);
-console.log("Data to update for other user:", {
-    chats: arrayUnion({
-        chatId: newchatRef.id,
-        lastMessage: "",
-        receiverId: currentUser.id,
-        updatedAt: Date.now(),
-    }),
-});
-
-
-                    // Updating userchats collection for other user
-                    await updateDoc(doc(userChatsRef, user.id) , {
-                        chats: arrayUnion({
-                            chatId: newchatRef.id,
-                            lastMessage: "",
-                            receiverId: currentUser.id,
-                            updatedAt: Date.now(),    
-                        }),
-                    });
-                    
-
-
-                            // Before updating userchats for current user
-console.log("Updating userchats for current user ID:", currentUser.id);
-console.log("Data to update for current user:", {
-    chats: arrayUnion({
-        chatId: newchatRef.id,
-        lastMessage: "",
-        receiverId: user.id,
-        updatedAt: Date.now(),
-    }),
-});
                     
                     // Updating userchats collection for current user 
                     await updateDoc(doc(userChatsRef, currentUser.id), {
