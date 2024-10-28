@@ -78,7 +78,7 @@ const ChatList = () =>
                     {
                         console.log("No such Document!")
                         await createEmptyChats();
-                        setChats({});
+                        setChats([]);
                     }
                     
                 } , (error) =>
@@ -98,7 +98,7 @@ const ChatList = () =>
 
     // Function to Filter out names
     const filterChats = chats.filter(item =>
-        item.name.toLowerCase().includes(searchItem.toLowerCase()) // checks if the name is there in object and in the searched bar value
+        item && item.name &&item.name.toLowerCase().includes(searchItem.toLowerCase()) // checks if the name is there in object and in the searched bar value
     )
 
         return (
@@ -125,8 +125,8 @@ const ChatList = () =>
                     <div className="item" key={item.chatid}>
                         <img src={avatar} alt='user' />
                         <div className="texts">
-                            <span>{item.name}</span>
-                            <p className='texts-p'>{item.lastMessage}</p>
+                            <span>{item.user?.name || "Unknown user"}</span> 
+                            <p className='texts-p'>{item.lastMessage || "No messages yet"}</p>
                         </div>
                     </div>
                 ))}
