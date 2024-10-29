@@ -29,6 +29,7 @@ const Login = () =>
         const validateForm = () =>
         {
             const newErrors = {};
+            // Email validation
             if(!loginData.email.trim())
             {
                 newErrors.email = "Email is required"
@@ -36,16 +37,32 @@ const Login = () =>
 
             else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginData.email))
             {
-                newErrors.email = "Email is not valid"
+                newErrors.email = "Email is not valid";
             }
 
+            // Password validation
+            if(!loginData.password.trim())
+            {
+                newErrors.password = "Password is required";
+            }
+
+            else if (loginData.password.length < 6)
+            {
+                newErrors.password = "Password must be at least 6 characters";
+            }
+
+            setErrors(newErrors);
+            return Object.keys(newErrors).length === 0; // Return the function with 0 error in the newErrors object by checking their key's length
 
         }
 
         // Handling the Login form after submission
         const handleLogin = async (e) =>
         {
-            e.preventDefault()
+            e.preventDefault();
+
+            // Validate form before proceeding
+            if(!validateForm()) return;
             setLoading(true);
 
             const { email, password } = loginData;
@@ -53,12 +70,24 @@ const Login = () =>
             try
             {
                 const userCredential =  await signInWithEmailAndPassword(auth,email,password)
-                toast.success("Successful Login!")
+                const user = userCredential.user // Extract the user object
+                console.log("Logged in user: " , user.email)
+                toast.success(`Welcome back!`)
             }
             catch(err)
             {
-                console.log("Login error:",err)
-                toast.error(err.message)
+                console.log("Login error:",err.code , err.message);
+
+
+                if (err.code === 'auth/user-not-found') {
+                    toast.error("User not found. Please check your credentials or sign up.");
+                } else if (err.code === 'auth/wrong-password') {
+                    toast.error("Incorrect password. Please try again.");
+                } else if (err.code === 'auth/invalid-credential') {
+                    toast.error("Invalid credentials. Please try again.");
+                } else {
+                    toast.error("An error occurred. Please try again later.");
+                }
             }
 
             finally
@@ -90,6 +119,7 @@ const Login = () =>
                         <div className="col-right">
                             <h1 className="header-text">Welcome To Legal Help Office</h1>
                             <h4>Sign into your account</h4>
+
                             {/* Form starts */}
                             <form id="loginForm" onSubmit={handleLogin}>
                                 <div className="form-row">
@@ -102,13 +132,13 @@ const Login = () =>
                                         className="form-control" 
                                         value={loginData.email}
                                         onChange={handleChange} />
-                                    <div id="EmailError" className="error-message"></div>
+                                        {errors && <div id="EmailError" className="error-message">{errors.email}</div>}
                                     </div>
                                     <div className="form-group">
                                         <input type="password" name="password" placeholder="Password" id="passwordInput" className="form-control" 
                                         value={loginData.password}
                                         onChange={handleChange} />
-                                    <div id="passwordError" className="error-message"></div>
+                                  {errors &&  <div id="passwordError" className="error-message">{errors.password}</div>}
                                     </div>
                                     <div className="form-group">
                                     <button id="loginbtn" className="btn" aria-pressed="true" disabled={loading}> <span>{loading ? "Loading..." : "Login"}</span></button>
