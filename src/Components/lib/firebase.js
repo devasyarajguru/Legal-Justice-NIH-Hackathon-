@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import {getAuth} from 'firebase/auth'
 import {getFirestore} from 'firebase/firestore'
 import {getStorage} from 'firebase/storage'
+import farmhash from 'farmhash-modern?url';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
@@ -19,7 +20,19 @@ const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app);
 
 // Getting the auth , db storage from firebase
-export const auth = getAuth()
-export const db = getFirestore()
-export const storage = getStorage()
+export const auth = getAuth(app)
+export const db = getFirestore(app)
+export const storage = getStorage(app)
+
+// Admin SDK config
+import admin from 'firebase-admin';
+import serviceAccount from '../../../SDK-key.json'
+
+if(!admin.apps.length)
+{
+  admin.initializeApp({
+    credential:admin.credential.cert(serviceAccount),
+    databaseURL:"https://react-chat-bb59a.firebaseio.com",
+  })
+}
 
