@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import {getAuth} from 'firebase/auth'
 import {getFirestore} from 'firebase/firestore'
 import {getStorage} from 'firebase/storage'
-import farmhash from 'farmhash-modern?url';
+// import farmhash from 'farmhash-modern?url';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
