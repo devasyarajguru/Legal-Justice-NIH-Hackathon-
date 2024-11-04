@@ -25,14 +25,14 @@ export const db = getFirestore(app)
 export const storage = getStorage(app)
 
 // Admin SDK config
-import admin from 'firebase-admin';
-import serviceAccount from '../../../SDK-key.json'
+// import admin from 'firebase-admin';
+// import serviceAccount from '../../../SDK-key.json'
 
-if(!admin.apps.length)
-{
-  admin.initializeApp({
-    credential:admin.credential.cert(serviceAccount),
-    databaseURL:"https://react-chat-bb59a.firebaseio.com",
-  })
-}
+// if(!admin.apps.length)
+// {
+//   admin.initializeApp({
+//     credential:admin.credential.cert(serviceAccount),
+//     databaseURL:"https://react-chat-bb59a.firebaseio.com",
+//   })
+// }
 
