@@ -21,12 +21,12 @@ const ChatList = () =>
 
         // Getting the chat list of the current user
         useEffect(() =>
-        {       
+        {
 
             const createEmptyChats = async () =>
             {
                 try {
-                    await setDoc(doc(db , "userchats" , currentUser.id) , {chats: []}); 
+                    await setDoc(doc(db , "userchats" , currentUser.id) , {chats: []});
                     console.log("New userchats document created for:", currentUser.id);
                 }
 
@@ -61,30 +61,32 @@ const ChatList = () =>
                         // use of promise to fetch data of each chat conversations of authenticated users by receiver id 
                         const promises = items.map (async (item) =>
                         {
-                            const receiverID = item.receiverID || item.receiverId;
-                            if(receiverID)
+                            // Add null check for receiverID
+                            if(!item?.receiverID)
                             {
-                                const userDocRef = doc(db, "users", item.receiverID);
-                                const userDocSnap = await getDoc(userDocRef);
-
-                            if(userDocSnap.exists())
-                            {
-                                const user = userDocSnap.data()
-                                return {...item , user}
+                                console.log("No receiverID found for item: ", item)
                             }
 
-                            else
+                            try
                             {
-                                console.warn("No user document found for reciever ID: " , receiverID)
-                                return null;
+
+                            const userDocRef = doc(db, "users", item.receiverID);
+                            const userDocSnap = await getDoc(userDocRef);
+
+                            if(!userDocSnap.exists())
+                            {
+                                console.log("No user document found for: ", item.receiverID)
                             }
 
-                            }
-                            else
-                            {
-                                console.warn("Invalid reciever ID found in item: " , item)
-                                return null;
-                            }
+                            const user = userDocSnap.data()
+
+                            return {...item , user};
+                        }
+                        catch(error)
+                        {
+                            console.error("Error fetching user document: ",error);
+                            return null;
+                        }
                         })
 
                         const chatData = await Promise.all(promises)  // would be necessary to ensure that it wait for all the async getDoc calls to complete.
@@ -94,14 +96,14 @@ const ChatList = () =>
 
                     else
                     {
-                        console.log("No such Document!")
+                        console.log("No userchats document found , creating one...")
                         await createEmptyChats();
                         setChats([]);
                     }
                     
                 } , (error) =>
                 {
-                    console.log("Error while fetching details" , error)
+                    console.log("Error in snapshot listener" , error)
                 });
             
             return () =>
@@ -111,12 +113,22 @@ const ChatList = () =>
 
         }
 
-        },[currentUser.id])
+        },[currentUser?.id])
 
 
     // Function to Filter out names
- 
+    const filterChats = chats.filter(item =>
+        item?.user?.name?.toLowerCase().includes(searchItem.toLowerCase())
+       /* item && item.user && item.user.name && item.user.name.toLowerCase().includes(searchItem.toLowerCase()) */
+        // checks if the name is there in object and in the searched bar value
+    )
 
+    useEffect(() =>
+    {
+        console.log("Current chats",chats)
+        console.log("Search item" , searchItem)
+        console.log("Filtered chats",filterChats)
+    },[chats,searchItem])
 
         return (
             // chatList main container starts
@@ -138,11 +150,11 @@ const ChatList = () =>
                 {/* Chat item starts*/} 
 
                 {/* Displaying names of users also with filer values if search through searchBar */}
-                {chats.map(item => (
+                {filterChats.map(item => (
                     <div className="item" key={item.chatid}>
                         <img src={avatar} alt='user' />
                         <div className="texts">
-                            <span>{item.user.name || "Unknown user"}</span> 
+                            <span>{item.user?.username || "Unknown user"}</span> 
                             <p className='texts-p'>{item.lastMessage || "No messages yet"}</p>
                         </div>
                     </div>
