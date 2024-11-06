@@ -68,3 +68,16 @@
     border: none;
     cursor: pointer;
 }
+
+.search-results span
+{
+    padding: 10px;
+    font-size: 22px;
+}
+
+.no-results
+{
+    padding: 10px;
+    font-size: 22px;
+    color: white;
+}
