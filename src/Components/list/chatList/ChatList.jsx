@@ -37,17 +37,19 @@ const ChatList = () =>
             }
 
             // If there is current user and id exist
-            if(currentUser && currentUser.id)
+            if(currentUser?.id)
             {
                 // Firestore database document using onSnapshot. --> onSnapshot is a real-time listener that allows you to recieve updates whenever data in firestore changes just like chats of user changes. 
 
                 // Every time the document changes (e.g., a new message is sent), the callback function (res parameter) is triggered with the latest document snapshot.
 
                 const unSub = onSnapshot(doc(db, "userchats", currentUser.id), async (res) => {
-                    // If the document exits
+                    // If the document exits  
+                    try{
                     if(res.exists())
                     {
                         const items = res.data().chats || []; // getting the chats of list of users ,eg. -  5 users 5 chats
+                        console.log("Raw chat Items from firebase: ", items)
                     
                         /*{
                             "chats": [
@@ -62,25 +64,31 @@ const ChatList = () =>
                         const promises = items.map (async (item) =>
                         {
                             // Add null check for receiverID
-                            if(!item?.receiverID)
+                            if(!item?.receiverId)
                             {
                                 console.log("No receiverID found for item: ", item)
+                                return null;
                             }
 
                             try
                             {
 
-                            const userDocRef = doc(db, "users", item.receiverID);
+                            const userDocRef = doc(db, "users", item.receiverId);
                             const userDocSnap = await getDoc(userDocRef);
 
                             if(!userDocSnap.exists())
                             {
                                 console.log("No user document found for: ", item.receiverID)
+                                return null;
                             }
 
-                            const user = userDocSnap.data()
+                            const userData = userDocSnap.data()
 
-                            return {...item , user};
+                            return {
+                                ...item , 
+                                user:userData,
+                                updatedAt: item.updatedAt || Date.now()
+                            };
                         }
                         catch(error)
                         {
@@ -89,9 +97,11 @@ const ChatList = () =>
                         }
                         })
 
-                        const chatData = await Promise.all(promises)  // would be necessary to ensure that it wait for all the async getDoc calls to complete.
+                        const chatData = (await Promise.all(promises))
+                        .filter(chat => chat !== null)
+                        .sort((a,b) => (b?.updatedAt || 0) - (a?.updatedAt || 0))
 
-                        setChats(chatData.sort((a,b) => b.updatedAt - a.updatedAt))
+                        setChats(chatData)
                     }
 
                     else
@@ -101,9 +111,11 @@ const ChatList = () =>
                         setChats([]);
                     }
                     
-                } , (error) =>
+                } catch (error) 
                 {
-                    console.log("Error in snapshot listener" , error)
+                    console.log("Error in snapshot listener" , error);
+                    setChats([]);
+                }
                 });
             
             return () =>
@@ -118,18 +130,12 @@ const ChatList = () =>
 
     // Function to Filter out names
     const filterChats = chats.filter(item =>
-        item?.user?.name?.toLowerCase().includes(searchItem.toLowerCase())
+        item?.user?.username?.toLowerCase().includes(searchItem.toLowerCase())
        /* item && item.user && item.user.name && item.user.name.toLowerCase().includes(searchItem.toLowerCase()) */
         // checks if the name is there in object and in the searched bar value
     )
 
-    useEffect(() =>
-    {
-        console.log("Current chats",chats)
-        console.log("Search item" , searchItem)
-        console.log("Filtered chats",filterChats)
-    },[chats,searchItem])
-
+   
         return (
             // chatList main container starts
             <div className="chatList">
@@ -151,7 +157,7 @@ const ChatList = () =>
 
                 {/* Displaying names of users also with filer values if search through searchBar */}
                 {filterChats.map(item => (
-                    <div className="item" key={item.chatid}>
+                    <div className="item" key={item.chatId}>
                         <img src={avatar} alt='user' />
                         <div className="texts">
                             <span>{item.user?.username || "Unknown user"}</span> 
