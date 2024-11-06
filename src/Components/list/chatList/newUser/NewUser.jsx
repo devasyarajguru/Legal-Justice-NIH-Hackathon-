@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import avatar from "../../../../assets/avatar.png"
 import { db } from "../../../lib/firebase";
 import "./NewUser.css"
@@ -9,11 +9,49 @@ import { useUserStore } from "../../../lib/userStore";
 const NewUser = () =>
 {
     const [user,setUser] = useState(null) // storing the user data when a search result is found
-
+    const [searchTerm,setSearchTerm] = useState("") // New State for search term
+    const [allUsers,setAllUsers] = useState([]) // New State for all users
     const {currentUser} = useUserStore() // current user from UserStore
 
+    // Fetching all users when component mounts
+    useEffect(()=>
+    {
+        // Fetching all users from firestore
+        const fetchUsers = async () =>
+        {
+            try
+            {
+                const userRef = collection(db, "users")// Reference to the users collection
+                const querySnapshot  = await getDocs(userRef) // Fetching all users
+                const users = querySnapshot.docs
+                .map(doc =>
+                (
+                    {...doc.data(),
+                        id:doc.id
+                    }
+                )
+                ).filter(user => user.id !== currentUser.id); // Excluding the current user from the list
+
+                setAllUsers(users) // Updating the state with the fetched users
+            }
+            catch(error)
+            {
+                console.error("Error fetching users: ",error)
+            }
+        };
+
+        fetchUsers() // Calling the fetchUsers function
+    },[currentUser.id]);
+
+    //filter users based on search term
+    // ? - optional chaining operator. If user is null , then it will not throw an error and will return undefined
+    const filteredUsers = allUsers.filter(user =>
+        user?.username?.toLowerCase().includes(searchTerm.toLowerCase()) // Here includes() have range of values to check if the search term is present in the username
+    )
+
+
     // Handling the searched users
-    const handleSearch = async e =>
+    /*const handleSearch = async e =>
         {
             e.preventDefault()
 
@@ -52,20 +90,23 @@ const NewUser = () =>
             alert("An error occured: " + err.message)
             console.error("Error while searching:" , err)
            }
-        }
+        }*/
 
 
 
         // function add user while searching username
-        const handleAdd =  async (e) =>
-        {
-            e.preventDefault()
-            
+        const handleAdd =  async () =>
+        { 
             try {
-                // Check if chat already exists
+                // Add logging to see what's happening
+                console.log("Current user:", currentUser);
+                console.log("User to add:", user);
+
                 const userChatsDoc = await getDoc(doc(db, "userchats", currentUser.id));
                 if (userChatsDoc.exists()) {
                     const existingChats = userChatsDoc.data().chats || [];
+                    console.log("Existing chats:", existingChats);
+                    
                     const chatExists = existingChats.some(chat => chat.receiverId === user.id);
                     
                     if (chatExists) {
@@ -106,6 +147,9 @@ const NewUser = () =>
                         });
 
                         console.log("Userchats updated successfully.");
+
+                        setSearchTerm("") // Clearing the search term after adding the user
+                        setUser(null) // Clearing the user after adding the user
                     }
                     
                     catch(err)
@@ -120,26 +164,55 @@ const NewUser = () =>
                 console.error("Error:", err);
                 alert("An error occurred: " + err.message);
             }
+
+            // After successful update
+            console.log("Chat added successfully");
         }
             
     return(
         <>
             <div className="addUser">
-                <form onSubmit={handleSearch}>
-                    <input type="text" placeholder="username" name="username"/>
-                    <button>Search</button>
-                </form>
-                {user && 
-                <div className="new-user">
-                    <div className="new-detail">
-                        <img src={user.avatar || avatar} alt="user-avatar"/>
-                        <span>{user.username}</span>
-                    </div>
-                    <button onClick={handleAdd}>Add User</button>
-                </div>
-                }
+            <div className="search-container">
+                <input 
+                    type="text" 
+                    placeholder="Search username..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="search-input"
+                />
                 
+                {/* Show filtered results directly with Add button */}
+                {searchTerm && (
+                    <div className="search-results">
+                        {filteredUsers.map(filteredUser => (
+                            <div key={filteredUser.id} className="new-user">
+                                <div className="new-detail">
+                                    <img 
+                                        src={filteredUser.avatar || avatar} 
+                                        alt="user-avatar"
+                                        className="selected-avatar"
+                                    />
+                                    <span>{filteredUser.username}</span>
+                                </div>
+                                <button 
+                                    onClick={() => {
+                                        // OnClicking the button , the user is set to the filtered user and the handleAdd function is called
+                                        setUser(filteredUser);
+                                        handleAdd();
+                                    }} 
+                                    className="add-button"
+                                >
+                                    Add User
+                                </button>
+                            </div>
+                        ))}
+                        {filteredUsers.length === 0 && (
+                            <div className="no-results">No users found</div>
+                        )}
+                    </div>
+                )}
             </div>
+        </div>
         </>
     )
 }
