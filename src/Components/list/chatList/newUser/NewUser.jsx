@@ -8,7 +8,7 @@ import { useUserStore } from "../../../lib/userStore";
 // 2:18:46 
 const NewUser = () =>
 {
-    const [user,setUser] = useState(null) // storing the user data when a search result is found
+    // const [user,setUser] = useState(null) // storing the user data when a search result is found
     const [searchTerm,setSearchTerm] = useState("") // New State for search term
     const [allUsers,setAllUsers] = useState([]) // New State for all users
     const {currentUser} = useUserStore() // current user from UserStore
@@ -95,79 +95,92 @@ const NewUser = () =>
 
 
         // function add user while searching username
-        const handleAdd =  async () =>
-        { 
-            try {
-                // Add logging to see what's happening
-                console.log("Current user:", currentUser);
-                console.log("User to add:", user);
+        const handleAdd = async (userToAdd) => { 
+            if (!userToAdd || !currentUser) {
+                console.error("Missing user data:", { userToAdd, currentUser });
+                alert("Cannot add user: Missing required data");
+                return;
+            }
 
-                const userChatsDoc = await getDoc(doc(db, "userchats", currentUser.id));
-                if (userChatsDoc.exists()) {
-                    const existingChats = userChatsDoc.data().chats || [];
-                    console.log("Existing chats:", existingChats);
-                    
-                    const chatExists = existingChats.some(chat => chat.receiverId === user.id);
-                    
-                    if (chatExists) {
-                        alert("Chat already exists with this user!");
-                        return;
-                    }
+            try {
+                // Add detailed logging
+                console.log("Starting user addition process...");
+                console.log("Current user:", currentUser);
+                console.log("User to add:", userToAdd);
+
+                // Check if userchats document exists for current user
+                const userChatsRef = doc(db, "userchats", currentUser.id);
+                const userChatsDoc = await getDoc(userChatsRef);
+
+                if (!userChatsDoc.exists()) {
+                    // Create initial userchats document if it doesn't exist
+                    console.log("Creating new userchats document");
+                    await setDoc(userChatsRef, { chats: [] });
                 }
 
-                const chatRef = collection(db, "chats"); // Assigning Collection chats
-                const userChatsRef = collection(db,"userchats"); // Assigning Collection userchats
-
-
-                    try
-                    {
-                        const newchatRef = doc(chatRef); // Refering to the "chats" documnet
-                        await setDoc(
-                            newchatRef, // Setting the values in "chats" doc
-                            {
-                                createdAt: serverTimestamp(), // to include a server-generated timestamp in the written data
-                                messages: [], // 
-                                participants: [currentUser.id , user.id]
-                            }
-                        );
-
-                        console.log("New Chat Document Reference:", newchatRef);
+                // Check for existing chat
+                const existingChats = userChatsDoc.exists() ? userChatsDoc.data().chats || [] : [];
+                console.log("Existing chats:", existingChats);
                 
-                        console.log("Chat successfully created with participants:", [currentUser.id, user.id]);
+                if (existingChats.some(chat => chat.receiverId === userToAdd.id)) {
+                    console.log("Chat already exists");
+                    alert("Chat already exists with this user!");
+                    return;
+                }
 
-                        
-                        // Updating userchats collection for current user 
-                        await updateDoc(doc(userChatsRef, currentUser.id), {
-                            chats: arrayUnion({
-                                chatId: newchatRef.id,
-                                lastMessage: "",
-                                receiverId: user.id,
-                                updatedAt: Date.now(),
-                            }),
-                        });
+                // Create new chat document
+                const chatRef = doc(collection(db, "chats"));
+                console.log("Creating new chat with ID:", chatRef.id);
 
-                        console.log("Userchats updated successfully.");
+                await setDoc(chatRef, {
+                    createdAt: serverTimestamp(),
+                    messages: [],
+                    participants: [currentUser.id, userToAdd.id]
+                });
 
-                        setSearchTerm("") // Clearing the search term after adding the user
-                        setUser(null) // Clearing the user after adding the user
-                    }
-                    
-                    catch(err)
-                    {
-                        console.log("Error" ,JSON.stringify(err))
-                        alert("An error occured: " + err.message)
-                    }
+                // Update both users' userchats
+                const chatData = {
+                    chatId: chatRef.id,
+                    lastMessage: "",
+                    receiverId: userToAdd.id,
+                    updatedAt: Date.now(),
+                };
+
+                // Update current user's chats
+                await updateDoc(userChatsRef, {
+                    chats: arrayUnion(chatData)
+                });
+
+                // Update receiver's userchats
+                const receiverChatsRef = doc(db, "userchats", userToAdd.id);
+                const receiverData = {
+                    ...chatData,
+                    receiverId: currentUser.id
+                };
+
+                const receiverDoc = await getDoc(receiverChatsRef);
+                if (!receiverDoc.exists()) {
+                    await setDoc(receiverChatsRef, { chats: [receiverData] });
+                } else {
+                    await updateDoc(receiverChatsRef, {
+                        chats: arrayUnion(receiverData)
+                    });
+                }
+
+                console.log("Chat added successfully");
+                setSearchTerm("");
+                // setUser(null);
+
+            } catch (err) {
+                console.error("Detailed error:", {
+                    error: err,
+                    errorMessage: err.message,
+                    errorCode: err.code,
+                    errorStack: err.stack
+                });
+                alert(`Error adding user: ${err.message}. Please try again.`);
             }
-                
-            catch(err)
-            {
-                console.error("Error:", err);
-                alert("An error occurred: " + err.message);
-            }
-
-            // After successful update
-            console.log("Chat added successfully");
-        }
+        };
             
     return(
         <>
@@ -195,11 +208,7 @@ const NewUser = () =>
                                     <span>{filteredUser.username}</span>
                                 </div>
                                 <button 
-                                    onClick={() => {
-                                        // OnClicking the button , the user is set to the filtered user and the handleAdd function is called
-                                        setUser(filteredUser);
-                                        handleAdd();
-                                    }} 
+                                    onClick={() => handleAdd(filteredUser)}
                                     className="add-button"
                                 >
                                     Add User
