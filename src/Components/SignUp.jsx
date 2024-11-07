@@ -8,11 +8,14 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import {auth,db} from './lib/firebase'
 import { doc, setDoc } from "firebase/firestore"; 
 import upload from './lib/upload';
+import { useNavigate } from 'react-router-dom';
 
 
 
 const SignUp = () =>
     {
+        const navigate = useNavigate();
+
         // Loading symbol when submitted
         const [loading,setLoading] = useState(false)
 
@@ -117,20 +120,37 @@ const SignUp = () =>
                 {
                     e.preventDefault(e.target)
 
-                    setLoading(true);
-
                     const formData = new FormData(e.target);  // FormData constructor which gathers the key/value pairs from the form for eg. username , email and password
 
                     const {username , email, password} = Object.fromEntries(formData);   // It is a method that transforms a list of key-value pairs into an Object. In Object keys are the form field names and the values are form field values
 
+                    if(!validateForm())
+                        {
+                            toast.error("Please check all the required fields");
+                            return;
+                        }
+
                     try 
                     {
+                        setLoading(true);
                         const res = await createUserWithEmailAndPassword(auth,email,password) // Creating user with email and password
 
                         let imgURL = '';
                         if (avatar && avatar.file)
                         {
-                             imgURL = await upload(avatar.file) // uploading image to the firebase. The image is which we have choosen for avatar image
+                            try
+                            {
+                                imgURL = await upload(avatar.file) // uploading image to the firebase. The image is which we have choosen for avatar image
+                            }
+                            catch(uploadError)
+                            {
+                                console.log("Error uploading image: ",uploadError);
+                                toast.error("Error uploading image: " + uploadError.message);
+                                setLoading(false);
+                                return;
+
+                            }
+                            
                         }      
 
                         else
@@ -152,24 +172,17 @@ const SignUp = () =>
                             chats:[]
                         });
 
-                        toast.success("Signup successful")
+                        toast.success("Signup successful");
+                        navigate("/interface" , {replace:true})
+
                     }
                     catch(error)
                     {
                         console.log("Firestore error: ",error);
                         toast.error("Error while adding user: " + error.message)
+                        setLoading(false);
+
                     }
-
-                    finally
-                    {
-                        setLoading(false)
-                    }
-
-                if(validateForm())
-                {
-                    toast.success("Form Submitted successfully!")
-                }
-
             }    
 
 
