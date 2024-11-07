@@ -158,7 +158,7 @@ const ChatList = () =>
                 {/* Displaying names of users also with filer values if search through searchBar */}
                 {filterChats.map(item => (
                     <div className="item" key={item.chatId}>
-                        <img src={avatar} alt='user' />
+                        <img src={item.user?.avatar||avatar} alt='user' />
                         <div className="texts">
                             <span>{item.user?.username || "Unknown user"}</span> 
                             <p className='texts-p'>{item.lastMessage || "No messages yet"}</p>
