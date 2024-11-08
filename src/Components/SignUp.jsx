@@ -30,12 +30,13 @@ const SignUp = () =>
         // Handling avatar to set file selection and URL to display
         const handleAvatar = (e) =>
         {
-            if(e.target.files[0])
+            // if the file is selected , set the avatar state to the file and the url to the file
+            if(e.target.files[0]) // first file in the array
             {
                 setAvatar(
                     {
-                        file: e.target.files[0],
-                        url:URL.createObjectURL(e.target.files[0])
+                        file: e.target.files[0], // file is the selected file
+                        url:URL.createObjectURL(e.target.files[0]) // URL.createObjectURL is used to create a URL for the selected file , to display the image
                     }
                 )
 
@@ -49,6 +50,17 @@ const SignUp = () =>
             email:"",
             password:"",
         });
+
+         // Handling the change values in form
+
+         const handleChange = e =>
+            {
+                setFormData(
+                    {...formData,
+                        [e.target.name]:e.target.value  // spread operator 
+                    }
+                )
+            }
 
 
         // Storing errors
@@ -97,22 +109,10 @@ const SignUp = () =>
                 newErrors.password = "Password must contain at least one number";
             }    
 
-            setErrors(newErrors);
-            return Object.keys(newErrors).length === 0;
+            setErrors(newErrors); // setting the errors to the new errors
+            return Object.keys(newErrors).length === 0; // checking if the new errors are empty or not , if empty then return true
 
         }
-
-
-         // Handling the change values in form
-
-         const handleChange = e =>
-            {
-                setFormData(
-                    {...formData,
-                        [e.target.name]:e.target.value  // spread operator 
-                    }
-                )
-            }
 
 
         // Handling the form after submission
@@ -124,8 +124,9 @@ const SignUp = () =>
 
                     const {username , email, password} = Object.fromEntries(formData);   // It is a method that transforms a list of key-value pairs into an Object. In Object keys are the form field names and the values are form field values
 
-                    if(!validateForm())
+                    if(!validateForm()) // checking if the form is valid or not
                         {
+                            // if the form is not valid then show the error message
                             toast.error("Please check all the required fields");
                             return;
                         }
@@ -133,9 +134,10 @@ const SignUp = () =>
                     try 
                     {
                         setLoading(true);
-                        const res = await createUserWithEmailAndPassword(auth,email,password) // Creating user with email and password
+                        const res = await createUserWithEmailAndPassword(auth,email,password) // Creating a new user with email and password
 
-                        let imgURL = '';
+                        // if the avatar is selected and the file is selected then upload the image to the firebase
+                        let imgURL = ''; // Will store Firebase Storage URL
                         if (avatar && avatar.file)
                         {
                             try
@@ -155,25 +157,27 @@ const SignUp = () =>
 
                         else
                         {
-                            imgURL = myAvatar;
+                            imgURL = myAvatar; // Use default avatar if no image is selected
                         }
 
-                            // Add a new document in collection "users" , all the values
+                        // setting the user data to the firestore database collection "users"
                         await setDoc(doc(db, "users", res.user.uid), {
                             username,
                             email,
-                            avatar:imgURL,
+                            avatar:imgURL, // Store permanent URL in Firestore database
                             password,
                             blocked:[]
                         });
 
-                        // Add a new document in collection "userChats"
+                        // setting the user chats to the firestore database collection "userchats"
+
+                        // setting the chats to the firestore database collection "userchats"
                         await setDoc(doc(db, "userchats", res.user.uid), {
-                            chats:[]
+                            chats:[] // empty array to store the chats in the chatlist
                         });
 
                         toast.success("Signup successful");
-                        navigate("/interface" , {replace:true})
+                        navigate("/interface" , {replace:true}) // navigating to the interface page
 
                     }
                     catch(error)
@@ -201,6 +205,7 @@ const SignUp = () =>
                         <label htmlFor="file" id='myfile'>
                             <span>Upload an image</span></label>
                             <input type="file" id="file" name="file" style={{display:"none"}} onChange={handleAvatar}/>
+                            {/* avatar.url is the url of the image that we have selected for avatar , if not selected then it will be myAvatar */}
                             <img src={avatar.url || myAvatar}  alt='avatar-dp' />
                         </div>
                     </div>
