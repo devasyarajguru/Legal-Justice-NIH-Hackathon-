@@ -1,0 +1,28 @@
+/* Spinner.css */
+.spinner-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Full screen height */
+    /* background-color: #f8f9fa; Light gray for background */
+}
+
+.spinner-icon {
+    animation: rotate 1.5s linear infinite;
+}
+
+.icon.scales {
+    color: #0056b3; /* Dark blue, can adjust to match your theme */
+    width: 60px;
+    height: 60px;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
