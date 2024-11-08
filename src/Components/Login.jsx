@@ -65,12 +65,12 @@ const Login = () =>
             if(!validateForm()) return;
             setLoading(true);
 
-            const { email, password } = loginData;
+            const { email, password } = loginData; // Destructuring the loginData object
 
             try
             {
-                const userCredential =  await signInWithEmailAndPassword(auth,email,password)
-                const user = userCredential.user // Extract the user object
+                const userCredential =  await signInWithEmailAndPassword(auth,email,password) // Signing in with email and password
+                const user = userCredential.user  // Extract the user object
                 console.log("Logged in user: " , user.email)
                 toast.success(`Welcome back!`)
             }
