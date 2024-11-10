@@ -146,6 +146,7 @@ const SignUp = () =>
                             }
                             catch(uploadError)
                             {
+                                // if there is an error in uploading the image then show the error message
                                 console.log("Error uploading image: ",uploadError);
                                 toast.error("Error uploading image: " + uploadError.message);
                                 setLoading(false);
