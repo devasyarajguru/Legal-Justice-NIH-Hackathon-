@@ -1,0 +1,211 @@
+.construction-container {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(45deg, #f3f4f6 0%, #e5e7eb 100%);
+    overflow: hidden;
+  }
+  
+  .construction-card {
+    background: white;
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 600px;
+    margin: 1rem;
+    position: relative;
+    animation: fadeIn 1s ease-out;
+  }
+  
+  .emoji-container {
+    position: relative;
+    height: 80px;
+    margin-bottom: 1rem;
+  }
+  
+  .emoji {
+    font-size: 4rem;
+    animation: bounce 2s infinite;
+  }
+  
+  .gear {
+    position: absolute;
+    font-size: 2rem;
+    top: 0;
+    right: 35%;
+    animation: spin 4s linear infinite;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+    animation: slideIn 1s ease-out;
+  }
+  
+  .main-text {
+    font-size: 1.25rem;
+    color: #4a5568;
+    margin-bottom: 1rem;
+    animation: fadeIn 1s ease-out 0.5s both;
+  }
+  
+  .sub-text {
+    color: #718096;
+    animation: fadeIn 1s ease-out 0.7s both;
+  }
+  
+  .progress-bar {
+    width: 200px;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    margin: 2rem auto;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background: #4299e1;
+    animation: progress 2s ease-in-out infinite;
+  }
+  
+  .tools {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .tools span {
+    font-size: 1.5rem;
+    animation: wobble 2s ease-in-out infinite;
+  }
+  
+  .tools span:nth-child(2) {
+    animation-delay: 0.3s;
+  }
+  
+  .tools span:nth-child(3) {
+    animation-delay: 0.6s;
+  }
+  
+  /* Animations */
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes progress {
+    0% {
+      width: 0%;
+      background: #4299e1;
+    }
+    50% {
+      width: 100%;
+      background: #48bb78;
+    }
+    100% {
+      width: 0%;
+      background: #4299e1;
+    }
+  }
+  
+  @keyframes wobble {
+    0%, 100% {
+      transform: translateY(0) rotate(0);
+    }
+    50% {
+      transform: translateY(-10px) rotate(5deg);
+    }
+  }
+  
+  /* Hover Effects */
+  .construction-card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .construction-card {
+      padding: 2rem;
+      margin: 1rem;
+    }
+  
+    .title {
+      font-size: 2rem;
+    }
+  
+    .main-text {
+      font-size: 1rem;
+    }
+  
+    .emoji {
+      font-size: 3rem;
+    }
+  
+    .gear {
+      font-size: 1.5rem;
+    }
+  }
+  
+  /* Optional: Add a subtle background pattern */
+  .construction-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.2);
+    }
+  }
