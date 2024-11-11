@@ -24,9 +24,9 @@ const ChatList = () =>
         {
 
             const createEmptyChats = async () =>
-            {
+            {   
                 try {
-                    await setDoc(doc(db , "userchats" , currentUser.id) , {chats: []});
+                    await setDoc(doc(db , "userchats" , currentUser.id) , {chats: []}); // setting the chats to empty array so that we can store the chats of users in it and onSnapshot can listen to it , otherwise it will not listen to it
                     console.log("New userchats document created for:", currentUser.id);
                 }
 
@@ -48,7 +48,8 @@ const ChatList = () =>
                     try{
                     if(res.exists())
                     {
-                        const items = res.data().chats || []; // getting the chats of list of users ,eg. -  5 users 5 chats
+                        // getting the chats of list of users ,eg. -  5 users 5 chats
+                        const items = res.data().chats || []; // empty array if no chats
                         console.log("Raw chat Items from firebase: ", items)
                     
                         /*{
@@ -60,7 +61,8 @@ const ChatList = () =>
                                 "receiverID": "user2",
                               }, */
 
-                        // use of promise to fetch data of each chat conversations of authenticated users by receiver id 
+                    
+                        // Map through each chat item and create promises to fetch user data for each receiver
                         const promises = items.map (async (item) =>
                         {
                             // Add null check for receiverID
