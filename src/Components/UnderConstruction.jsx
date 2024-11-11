@@ -11,7 +11,7 @@ const UnderConstruction = () => {
           an amazing experience.
         </p>
         <p className="sub-text">
-          Expected Launch: Project Coming Soon
+          Expected Launch: Coming Soon
         </p>
         <p className="contact">
           Contact: devasya23work@gmail.com
