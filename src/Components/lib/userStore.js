@@ -2,12 +2,13 @@ import { doc, getDoc } from "firebase/firestore";
 import { create } from "zustand";
 import {db} from "./firebase"
 
+// zustand is a state management library for react to share state across components
 
- export const useUserStore = create((set) => (
+ export const useUserStore = create((set) => ( // create is a function that creates a store
 {
     currentUser:null,  // this will store the current user's data fetched from the firestore
     isLoading: true, // this is a boolean flag to indicate whether the user data is being fetched. Initially true.
-    fetchUserInfo: async(uid) =>
+    fetchUserInfo: async(uid) => // this is an async function that fetches user data from firestore. 
     {
         if(!uid) return set({currentUser: null , isLoading: false});  // if uid is null or invalid , it sets currentUser to null and isLoading to false. (indicating no user data is available)
 

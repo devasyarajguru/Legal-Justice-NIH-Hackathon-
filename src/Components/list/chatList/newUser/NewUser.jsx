@@ -26,8 +26,8 @@ const NewUser = () =>
                 const users = querySnapshot.docs
                 .map(doc =>
                 (
-                    {...doc.data(),
-                        id:doc.id
+                    {...doc.data(), // ...doc.data() is used to spread the user data into a new object
+                        id:doc.id // doc.id is the id of the user
                     }
                 )
                 ).filter(user => user.id !== currentUser.id); // Excluding the current user from the list
@@ -49,53 +49,9 @@ const NewUser = () =>
         user?.username?.toLowerCase().includes(searchTerm.toLowerCase()) // Here includes() have range of values to check if the search term is present in the username
     )
 
-
-    // Handling the searched users
-    /*const handleSearch = async e =>
-        {
-            e.preventDefault()
-
-            const formData = new FormData(e.target)
-            const username = formData.get("username")
-
-
-            if(!username.trim())
-            {
-                alert("Please enter username")
-            }
-           try
-           {
-            // users collectin reference
-            const userRef = collection(db, "users");
-            const q = query(userRef, where("username", "==", username)); // creating a firestore query to find a user whose username matches the one provided in the form
-
-            const querySnapShot = await getDocs(q) // executing the query and fetches matching documents from Firestore
-
-            if(!querySnapShot.empty)
-            {
-                const foundUser = { ...querySnapShot.docs[0].data() , id:querySnapShot.docs[0].id}
-
-                setUser(foundUser) // querySnapshot.docs is an array of document snapshots , since docs[0] for first value extracted by data()
-
-            }
-
-            else
-            {
-                console.log("No user found")
-            }
-           }
-
-           catch(err)
-           {
-            alert("An error occured: " + err.message)
-            console.error("Error while searching:" , err)
-           }
-        }*/
-
-
-
         // function add user while searching username
         const handleAdd = async (userToAdd) => { 
+            // Checks if we have both users' data before proceeding 
             if (!userToAdd || !currentUser) {
                 console.error("Missing user data:", { userToAdd, currentUser });
                 alert("Cannot add user: Missing required data");
@@ -121,7 +77,9 @@ const NewUser = () =>
                 // Check for existing chat
                 const existingChats = userChatsDoc.exists() ? userChatsDoc.data().chats || [] : [];
                 console.log("Existing chats:", existingChats);
-                
+                 
+                // Checks if the chat already exists with the userToAdd
+                // some() is used to check if any of the elements in the array satisfies the condition
                 if (existingChats.some(chat => chat.receiverId === userToAdd.id)) {
                     console.log("Chat already exists");
                     alert("Chat already exists with this user!");
@@ -132,6 +90,7 @@ const NewUser = () =>
                 const chatRef = doc(collection(db, "chats"));
                 console.log("Creating new chat with ID:", chatRef.id);
 
+                // Setting the chat document with the required data
                 await setDoc(chatRef, {
                     createdAt: serverTimestamp(),
                     messages: [],
@@ -148,29 +107,33 @@ const NewUser = () =>
 
                 // Update current user's chats
                 await updateDoc(userChatsRef, {
-                    chats: arrayUnion(chatData)
+                    chats: arrayUnion(chatData) // arrayUnion is used to add the chatData to the chats array in the current user's userchats document , without overwriting the existing chats
                 });
 
                 // Update receiver's userchats
                 const receiverChatsRef = doc(db, "userchats", userToAdd.id);
                 const receiverData = {
                     ...chatData,
-                    receiverId: currentUser.id
+                    receiverId: currentUser.id // In this receiver's userchats document, the receiverId is the current user's id that means the current user is the receiver and partner of the userToAdd.
                 };
 
+                // Checking if the receiver's userchats document exists
                 const receiverDoc = await getDoc(receiverChatsRef);
+                // If the receiver's userchats document does not exist, then we create a new one with the receiverData
                 if (!receiverDoc.exists()) {
                     await setDoc(receiverChatsRef, { chats: [receiverData] });
-                } else {
+                } 
+                // If the receiver's userchats document exists, then we update it with the receiverData
+                else {
                     await updateDoc(receiverChatsRef, {
-                        chats: arrayUnion(receiverData)
+                        chats: arrayUnion(receiverData) // arrayUnion is used to add the receiverData to the chats array in the receiver's userchats document , without overwriting the existing chats
                     });
                 }
 
                 console.log("Chat added successfully");
-                setSearchTerm("");
-                // setUser(null);
+                setSearchTerm(""); // Clearing the search term
 
+                // catch block for error handling
             } catch (err) {
                 console.error("Detailed error:", {
                     error: err,
