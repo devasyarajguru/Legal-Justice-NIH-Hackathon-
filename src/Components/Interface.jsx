@@ -9,10 +9,13 @@ import { useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import {auth} from './lib/firebase'
 import {useUserStore} from './lib/userStore';
+import { chatStore } from './lib/chatStore';
 
 // 2:05:49
 const Interface = () =>
     {
+        const {chatId} = chatStore();
+
         const {currentUser , isLoading , fetchUserInfo} = useUserStore() // useUserStore is a custom hook that provides the current user, loading state, and a function to fetch user information from the database.
 
         useEffect(() =>
@@ -40,8 +43,8 @@ const Interface = () =>
                 (
                     <>
                     <List />
-                    <Chat />
-                    <Detail />
+                   {chatId && <Chat />}
+                   {chatId && <Detail />}
                     </>
                 ) 
                 // if the user is not authenticated , show the login component
