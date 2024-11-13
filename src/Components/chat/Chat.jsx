@@ -41,6 +41,7 @@ const Chat = () =>
     // Getting the chat from firestore database
      useEffect(() =>
     {
+        // getting the chat from firestore database
         const unSub = onSnapshot(doc(db,"chats",chatId),
         (res) =>
         {
