@@ -8,6 +8,7 @@ import { useUserStore } from '../../lib/userStore';
 import { doc, onSnapshot , getDoc, setDoc} from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import NewUser from './newUser/NewUser'
+import { chatStore } from '../../lib/chatStore';
 
 
 // 2:14:20
@@ -18,6 +19,8 @@ const ChatList = () =>
         const [searchItem, setSearchItem] = useState(""); // searching user names variable
 
         const {currentUser} = useUserStore(); // getting the current user from userStore
+
+        const {chatId,changeChat} = chatStore(); // getting the changeBlock function from chatStore
 
         // Getting the chat list of the current user
         useEffect(() =>
@@ -130,10 +133,15 @@ const ChatList = () =>
         },[currentUser?.id])
 
 
+        // Function to handle the selection of the chat
+        const handleSelect = async(item) =>
+        {
+            changeChat(item.chatId,item.user)
+        }
+
     // Function to Filter out names
     const filterChats = chats.filter(item =>
         item?.user?.username?.toLowerCase().includes(searchItem.toLowerCase())
-       /* item && item.user && item.user.name && item.user.name.toLowerCase().includes(searchItem.toLowerCase()) */
         // checks if the name is there in object and in the searched bar value
     )
 
@@ -159,7 +167,7 @@ const ChatList = () =>
 
                 {/* Displaying names of users also with filer values if search through searchBar */}
                 {filterChats.map(item => (
-                    <div className="item" key={item.chatId}>
+                    <div className="item" key={item.chatId} onClick={() =>handleSelect(item)}>
                         <img src={item.user?.avatar||avatar} alt='user' />
                         <div className="texts">
                             <span>{item.user?.username || "Unknown user"}</span> 
