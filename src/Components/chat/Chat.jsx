@@ -6,9 +6,18 @@ import camera from './assets/camera.png';
 import mic from './assets/mic.png';
 import EmojiPicker from 'emoji-picker-react';
 import {useRef, useState , useEffect} from 'react'
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { chatStore } from '../lib/chatStore';
 
 const Chat = () =>
 { 
+    // Getting the chatId from chatStore
+    const {chatId} = chatStore();
+
+    // Chat State
+    const [chat,setChat] = useState([])
+
     // Emoji state
     const [open, setOpen] = useState(false)
 
@@ -26,8 +35,25 @@ const Chat = () =>
 
     useEffect(() =>
     {
-        endRef.current.scrollIntoView({behaviour:"smooth"})
+        endRef.current.scrollIntoView({behaviour:"smooth"}) // scrolling to the end of the chat
     },[])
+
+    // Getting the chat from firestore database
+     useEffect(() =>
+    {
+        const unSub = onSnapshot(doc(db,"chats",chatId),
+        (res) =>
+        {
+            setChat(res.data()); // setting the chat state with the chat data from firestore
+        }
+    );
+
+    return () =>
+    {
+        unSub();
+    };
+    },[chatId])
+
 
     return (
         // chat main container starts
