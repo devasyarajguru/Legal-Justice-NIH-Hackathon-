@@ -10,6 +10,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { chatStore } from '../lib/chatStore';
 
+// Testing commits
 const Chat = () =>
 { 
     // Getting the chatId from chatStore
