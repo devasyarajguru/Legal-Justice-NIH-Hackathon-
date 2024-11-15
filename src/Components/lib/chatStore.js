@@ -1,7 +1,5 @@
 import { create } from "zustand";
 import { useUserStore } from "./userStore";
-// import { doc, getDoc } from "firebase/firestore";
-// import {db} from "./firebase"
 
 // zustand is a state management library for react to share state across components
 
@@ -14,10 +12,23 @@ import { useUserStore } from "./userStore";
     isRecieverBlocked:false, // isRecieverBlocked is a boolean flag to indicate whether the reciever is blocked by the current user
     changeChat:(chatId , user) =>
     {
+
+        console.log("ChatStore changeChat called with:", {
+            chatId,
+            user,
+            userId: user?.id
+        });
+
         const currentUser = useUserStore.getState().currentUser // getting the current user from the userStore
 
+        // Creating a user object with the id of receiver , added multiple conditions to handle different firebase user ids
+        const userWithId = {
+            ...user,
+            id: user.id || user.uid || user.receiverId
+        };
+
         // check if currentUser is blocked by the reciever
-        if (user.blocked.includes(currentUser.id))
+        if (userWithId.blocked?.includes(currentUser.id))
         {
             return set({
                 chatId,
@@ -29,11 +40,11 @@ import { useUserStore } from "./userStore";
 
         // check if reciever is blocked by the currentUser
 
-        else if (currentUser.blocked.includes(user.id))
+        else if (currentUser.blocked?.includes(userWithId.id))
             {
                 return set({
                     chatId,
-                    user:user,
+                    user:userWithId,
                     isCurrentUserBlocked:false,
                     isRecieverBlocked:true,
                 })
@@ -42,7 +53,7 @@ import { useUserStore } from "./userStore";
         else{
             return set({
                 chatId,
-                user,
+                user:userWithId,
                 isCurrentUserBlocked:false,
                 isRecieverBlocked:false,
             })   
