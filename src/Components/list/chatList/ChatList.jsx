@@ -20,7 +20,7 @@ const ChatList = () =>
 
         const {currentUser} = useUserStore(); // getting the current user from userStore
 
-        const {chatId,changeChat} = chatStore(); // getting the changeBlock function from chatStore
+        const {changeChat} = chatStore(); // getting the changeBlock function from chatStore
 
         // Getting the chat list of the current user
         useEffect(() =>
@@ -136,7 +136,28 @@ const ChatList = () =>
         // Function to handle the selection of the chat
         const handleSelect = async(item) =>
         {
-            changeChat(item.chatId,item.user)
+            console.log("Selecting chat: ",
+                {
+                    fullItem: item,
+                    chatId: item.chatId,
+                    user: item.user,
+                    userId: item.user?.id || item.receiverId
+                }
+            );
+
+            if(!item?.chatId || !item?.user)
+            {
+                console.error("Missing chat data in Handleselect: ",item);
+                return;
+            }
+            
+            // Creating a user object with the id of receiver
+            const userWithId = 
+            {
+                ...item.user,
+                id:item.receiverId
+            }
+            changeChat(item.chatId,userWithId)
         }
 
     // Function to Filter out names
