@@ -6,15 +6,19 @@ import camera from './assets/camera.png';
 import mic from './assets/mic.png';
 import EmojiPicker from 'emoji-picker-react';
 import {useRef, useState , useEffect} from 'react'
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc ,arrayUnion , getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { chatStore } from '../lib/chatStore';
+import { useUserStore } from '../lib/userStore';
 
-// Testing commits
+// 2:46:22
 const Chat = () =>
 { 
+    // Getting the current user from userStore
+    const {currentUser} = useUserStore();
+
     // Getting the chatId from chatStore
-    const {chatId} = chatStore();
+    const {chatId,user} = chatStore();
 
     // Chat State
     const [chat,setChat] = useState([])
@@ -25,14 +29,40 @@ const Chat = () =>
     // Input text state
     const [text,setText] = useState("")
 
-    // Handling emoji 
-    const handleEmoji = e =>
-    {
-        setText(prev => prev + e.emoji)
-        setOpen(false)
-    }
+    const endRef = useRef(null) // endRef for scrolling to the end of the chat
 
-    const endRef = useRef(null) 
+    useEffect(() => {
+        console.log("User object:", {
+            fullUser: user,
+            userId: user?.id,
+            userProperties: user ? Object.keys(user) : null
+        });
+    }, [user]);
+
+    useEffect(() => {
+        console.log("Chat Component State:", {
+            chatId,
+            user,
+            currentUser
+        });
+    }, [chatId, user, currentUser]);
+
+    useEffect(() => {
+        if (!chatId || !user || !currentUser) {
+            console.log("Required data missing:", {
+                chatId,
+                user,
+                currentUser
+            });
+            return;
+        }
+
+        console.log("All required data available:", {
+            chatId,
+            user: user.id,
+            currentUser: currentUser.id
+        });
+    }, [chatId, user, currentUser]);
 
     useEffect(() =>
     {
@@ -42,10 +72,13 @@ const Chat = () =>
     // Getting the chat from firestore database
      useEffect(() =>
     {
+        console.log("ChatId: ",chatId); 
+        if (!chatId) return;
         // getting the chat from firestore database
         const unSub = onSnapshot(doc(db,"chats",chatId),
         (res) =>
         {
+            console.log("Chat Data: ",res.data());
             setChat(res.data()); // setting the chat state with the chat data from firestore
         }
     );
@@ -55,6 +88,126 @@ const Chat = () =>
         unSub();
     };
     },[chatId])
+
+    // Handling Send button
+    const handleSend = async () =>
+    {
+        console.log("Current chat state:", {
+            chatId,
+            user,
+            currentUser
+        });
+    
+        if (!chatId || !user || !currentUser?.id) {
+            console.error("Missing required data:", {
+                chatId,
+                user,
+                currentUserId: currentUser?.id
+            });
+            return;
+        }
+    
+        // Use the correct user ID property
+        const userId = user.id || user.uid; // Sometimes Firebase uses 'uid' instead of 'id'
+    
+        if (!userId) {
+            console.error("No user ID found in user object:", user);
+            return;
+        }
+    
+        if (!currentUser?.id) {
+            console.error("Missing currentUser ID");
+            return;
+        }
+
+        // if the text is empty, return
+        if(text.trim() === "") return;
+
+        // updating the chat in firestore
+        try{
+
+            console.log("Sending message with: ",
+                {
+                    chatId,
+                    currentUser: currentUser.id,
+                    user: user.id,
+                    text
+                }
+            )
+
+            await updateDoc(doc(db,"chats" ,chatId) ,
+        {
+            // adding the message to the chat
+            messages: arrayUnion({
+                senderId: currentUser.id, // sender id
+                text, // message text
+                createdAt:new Date() // created at time
+            })
+        });
+
+        setText("") // clear input after sending the message
+
+        // Update last message for both users
+        const userIDs = [currentUser.id , user.id];
+
+        for (const id of userIDs)
+        {
+        // getting the userchats from firestore
+        const userChatRef = doc(db,"userchats",id)
+        const userChatsSnapshot = await getDoc(userChatRef)
+
+        // if the userchats exists
+        if(userChatsSnapshot.exists())
+            {
+            const userChatsData = userChatsSnapshot.data() // getting the userchats data
+            const chatIndex = userChatsData.chats.findIndex(c => c.chatId === chatId) // finding the chat index
+            
+            if(chatIndex !== -1)
+                {
+                    // Created chat object with updated values
+                    const updatedChat =
+                    {
+                        ...userChatsData.chats[chatIndex], // copying the existing chat
+                        lastMessage: text, // updating the last message
+                        isSeen: id === currentUser.id ? true: false, // updating the isSeen to true because we have sent the message
+                        updatedAt: Date.now(), // updating the updatedAt time
+                        chatId:chatId, // updating the chatId
+                        receiverId: id === currentUser.id ? user.id : currentUser.id // updating the receiverId
+                        
+                    }
+
+                    // Updated chats array with the updated chat
+                    const updatedChats = [...userChatsData.chats]; // Copy all chats
+                    updatedChats[chatIndex] = updatedChat // Update the specific chat
+                    
+                    // Updating the userchats in firestore
+            await updateDoc(userChatRef ,   
+                {
+                    chats: updatedChats, // Updating the chats array with the updated chat
+                })
+                }
+            }
+        }
+    }
+        catch(err)
+        {
+            console.log("Error sending message: ",
+                {
+                    error:err,
+                    chatId,
+                    currentUser: currentUser?.id,
+                    user: user?.id
+                }
+            );
+        }
+    }
+
+    // Handling emoji 
+    const handleEmoji = e =>
+    {
+        setText(prev => prev + e.emoji) // setting the text state with the emoji
+        setOpen(false) // closing the emoji picker
+    }
 
 
     return (
@@ -72,73 +225,20 @@ const Chat = () =>
                 </div>
                 {/* user class ends */}
             </div>
-            {/* top class ends */}
+            {/* top class ends */}  
 
             {/* Center class starts */}
             <div className="center">
-                <div className="chat-message">
-                    <img src={avatar} alt='avatar'  className="user-avatar"/>
+                {chat?.messages?.map((message) =>
+                (  
+                    <div className="chat-message own" key={message.createdAt}>
                         <div className="chat-texts">
-                            <p className="sender-text">quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.
-                                
-                            </p>
-                            <span>1 min ago</span>
+                            {message.img && <img src={message.img} className='sender-image' alt='message-image'/>}
+                            <p className="own-text">{message.text}</p>
+                            {/* <span>{message}</span> */}
                         </div>
                 </div>
-                <div className="chat-message own">
-                        <div className="chat-texts">
-                            <img src="https://picsum.photos/200/300" className='sender-image'/>
-                            <p className="own-text">Hello</p>
-                            <p className="own-text">Hello ghdskj dskbsjsfs</p>
-                            <span>1 min ago</span>
-                        </div>
-                </div>
-                <div className="chat-message">
-                    <img src={avatar} alt='avatar' className="user-avatar"/>
-                        <div className="chat-texts">
-                            <p className="sender-text">Heyy</p>
-                            <span>1 min ago</span>
-                        </div>
-                </div>
-                <div className="chat-message own">
-                        <div className="chat-texts">
-                            <p className="own-text">How are You??</p>
-                            <span>1 min ago</span>
-                        </div>
-                </div>
-                <div className="chat-message">
-                    <img src={avatar} alt='avatar' className="user-avatar"/>
-                        <div className="chat-texts">
-                        <img src="https://picsum.photos/200/300" className='sender-image'/>
-                            <p className="sender-text">I am Good</p>
-                            <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim, molestias iusto </p>
-                            <p className="sender-text">Lorem ipsum dolor sit amee </p>
-                            <span>1 min ago</span>
-                        </div>
-                </div>
-                <div className="chat-message own">
-                        <div className="chat-texts">
-                            <p className="own-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nesciunt placeat quas, sit neque illo ad fuga voluptatibus ea quae? Eveniet quibusdam facilis, omnis placeat deserunt odit! Obcaecati, quisquam ipsa.</p>
-                            <span>1 min ago</span>
-                        </div>
-                </div>
-
-                <div className="chat-message">
-                    <img src={avatar} alt='avatar' className="user-avatar"/>
-                        <div className="chat-texts">
-                            <p className="sender-text">I am Good</p>
-                            <p className="sender-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim, molestias iusto </p>
-                            <p className="sender-text">Lorem ipsum dolor sit amee Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam unde qui at cupiditate ut eos accusamus magnam minus nisi cumque! Totam quidem ratione fugit iure repudiandae eos officia rerum perferendis. </p>
-                            <span>1 min ago</span>
-                        </div>
-                </div>
-
-                <div className="chat-message own">
-                        <div className="chat-texts">
-                            <p className="own-text">GoodGoodGoodGoodGood</p>
-                            <span>1 min ago</span>
-                        </div>
-                </div>
+                ))}
             </div>
             {/* Center class ends */}
 
@@ -165,7 +265,7 @@ const Chat = () =>
                     </div>
                     {/* emoji class ends */}
 
-                <button className="sendButton">Send</button>
+                <button className="sendButton" onClick={handleSend}>Send</button>
             </div>
             {/* bottom class ends */}
     
