@@ -53,7 +53,24 @@
     gap: 20px;
     padding: 20px;
     cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background-color: transparent;
+
 }
+
+.item:hover{
+    background-color: rgba(0, 0, 0, 0.2); 
+    cursor: pointer;
+}
+
+/* Selected chat style */
+.item.selected {
+    background-color: rgba(0, 0, 0, 0.1);  /* Darker gray background */
+}
+
+
+
+
 
 .item img
 {
@@ -62,6 +79,8 @@
     object-fit: cover;
     border-radius: 50%;
 }
+
+
 
 .texts
 {
