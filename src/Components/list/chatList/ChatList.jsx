@@ -22,6 +22,8 @@ const ChatList = () =>
 
         const {changeChat} = chatStore(); // getting the changeBlock function from chatStore
 
+        const [selectedChat,setSelectedChat] = useState(null); // selected chat variable
+
         // Getting the chat list of the current user
         useEffect(() =>
         {
@@ -136,6 +138,7 @@ const ChatList = () =>
         // Function to handle the selection of the chat
         const handleSelect = async(item) =>
         {
+            setSelectedChat(item.chatId)
             console.log("Selecting chat: ",
                 {
                     fullItem: item,
@@ -188,7 +191,7 @@ const ChatList = () =>
 
                 {/* Displaying names of users also with filer values if search through searchBar */}
                 {filterChats.map(item => (
-                    <div className="item" key={item.chatId} onClick={() =>handleSelect(item)}>
+                    <div className={`item ${!item.isSeen ? "unread" : ""} ${selectedChat === item.chatId ? "selected" : ""}`} key={item.chatId} onClick={() =>handleSelect(item)}>
                         <img src={item.user?.avatar||avatar} alt='user' />
                         <div className="texts">
                             <span>{item.user?.username || "Unknown user"}</span> 
