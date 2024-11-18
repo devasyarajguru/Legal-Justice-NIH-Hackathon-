@@ -29,40 +29,14 @@ const Chat = () =>
     // Input text state
     const [text,setText] = useState("")
 
+    // Image state
+    const [sendimg,setSendimg] = useState({
+        file:null,
+        url:""
+    })
+
     const endRef = useRef(null) // endRef for scrolling to the end of the chat
 
-    useEffect(() => {
-        console.log("User object:", {
-            fullUser: user,
-            userId: user?.id,
-            userProperties: user ? Object.keys(user) : null
-        });
-    }, [user]);
-
-    useEffect(() => {
-        console.log("Chat Component State:", {
-            chatId,
-            user,
-            currentUser
-        });
-    }, [chatId, user, currentUser]);
-
-    useEffect(() => {
-        if (!chatId || !user || !currentUser) {
-            console.log("Required data missing:", {
-                chatId,
-                user,
-                currentUser
-            });
-            return;
-        }
-
-        console.log("All required data available:", {
-            chatId,
-            user: user.id,
-            currentUser: currentUser.id
-        });
-    }, [chatId, user, currentUser]);
 
     useEffect(() =>
     {
@@ -92,18 +66,8 @@ const Chat = () =>
     // Handling Send button
     const handleSend = async () =>
     {
-        console.log("Current chat state:", {
-            chatId,
-            user,
-            currentUser
-        });
-    
+        // if the chatId, user or currentUser is not found, return
         if (!chatId || !user || !currentUser?.id) {
-            console.error("Missing required data:", {
-                chatId,
-                user,
-                currentUserId: currentUser?.id
-            });
             return;
         }
     
@@ -121,19 +85,15 @@ const Chat = () =>
         }
 
         // if the text is empty, return
-        if(text.trim() === "") return;
+        if(text.trim() === "" && !sendimg.file) return;
 
         // updating the chat in firestore
         try{
-
-            console.log("Sending message with: ",
-                {
-                    chatId,
-                    currentUser: currentUser.id,
-                    user: user.id,
-                    text
-                }
-            )
+        let imgUrl = null;
+        if(sendimg.file)
+            {
+                imgUrl = await upload(sendimg.file)
+            }            
 
             await updateDoc(doc(db,"chats" ,chatId) ,
         {
@@ -141,11 +101,19 @@ const Chat = () =>
             messages: arrayUnion({
                 senderId: currentUser.id, // sender id
                 text, // message text
-                createdAt:new Date() // created at time
+                createdAt:new Date(), // created at time
+                ...(imgUrl && {img: imgUrl})
             })
         });
 
+        // clearing the image state
+        setSendimg({
+            file:null,
+            url:""
+        }) 
+
         setText("") // clear input after sending the message
+        
 
         // Update last message for both users
         const userIDs = [currentUser.id , user.id];
@@ -209,6 +177,32 @@ const Chat = () =>
         setOpen(false) // closing the emoji picker
     }
 
+    // Handling image
+    const handleImage = (e) =>
+        {
+            // if the file is selected , set the avatar state to the file and the url to the file
+            if(e.target.files[0]) // first file in the array
+            {
+                setSendimg(
+                    {
+                        file: e.target.files[0], // file is the selected file
+                        url:URL.createObjectURL(e.target.files[0]) // URL.createObjectURL is used to create a URL for the selected file , to display the image
+                    }
+                )
+
+            }
+        }
+
+
+    // Handling key press
+    const handleKeyPress = e =>
+    {
+        if(e.key === "Enter" && !e.shiftKey)
+        {
+            e.preventDefault();
+            handleSend();
+        }
+    }
 
     return (
         // chat main container starts
@@ -231,10 +225,13 @@ const Chat = () =>
             <div className="center">
                 {chat?.messages?.map((message) =>
                 (  
-                    <div className="chat-message own" key={message.createdAt}>
+                    <div className={`chat-message ${message.senderId === currentUser.id ? "own" : ""}`} key={message.createdAt}>
                         <div className="chat-texts">
-                            {message.img && <img src={message.img} className='sender-image' alt='message-image'/>}
-                            <p className="own-text">{message.text}</p>
+                            {message.img && 
+                            (
+                            <img src={message.img} className='sender-image' alt='message-image'/>)}
+                            {message.text && <p className="own-text">{message.text}</p>}
+                            
                             {/* <span>{message}</span> */}
                         </div>
                 </div>
@@ -242,19 +239,32 @@ const Chat = () =>
             </div>
             {/* Center class ends */}
 
-            <div ref={endRef}></div>
+           {sendimg?.url && 
+           (
+           <div className="chat-message own">
+                <div className="chat-texts">
+                    <img src={sendimg.url} alt='image-icon' className="sender-image"/>
+                </div>
+            </div>
+            )}
+
+            {/* endRef for scrolling to the end of the chat */}
+            <div ref={endRef}></div>    
 
             {/* bottom class starts */}
             <div className="bottom">
                 {/* icons  */}
                 <div className="bottom-icons">
+                    <label htmlFor='file'>
                         <img src={img} alt='image-icon'/>
+                    </label>
+                        <input type='file' id="file" style={{display:"none"}} onChange={handleImage}/>
                         <img src={camera} alt='camera-icon'/>
                         <img src={mic} alt='mic-icon'/>
                 </div>
                 {/* icons  */}
 
-                    <input type='text' placeholder='Type a message...' onChange={e=>setText(e.target.value)} value={text}/> 
+                    <input type='text' placeholder='Type a message...' onChange={e=>setText(e.target.value)} onKeyDown={handleKeyPress} value={text}/> 
 
                     {/* emoji class starts */}
                     <div className="emoji">
