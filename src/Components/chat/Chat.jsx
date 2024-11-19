@@ -10,6 +10,7 @@ import { doc, onSnapshot, updateDoc ,arrayUnion , getDoc } from 'firebase/firest
 import { db } from '../lib/firebase';
 import { chatStore } from '../lib/chatStore';
 import { useUserStore } from '../lib/userStore';
+import upload from '../lib/upload';
 
 // 2:46:22
 const Chat = () =>
@@ -29,11 +30,7 @@ const Chat = () =>
     // Input text state
     const [text,setText] = useState("")
 
-    // Image state
-    const [sendimg,setSendimg] = useState({
-        file:null,
-        url:""
-    })
+    const [uploadProgress,setUploadProgress] = useState(0)
 
     const endRef = useRef(null) // endRef for scrolling to the end of the chat
 
@@ -41,7 +38,7 @@ const Chat = () =>
     useEffect(() =>
     {
         endRef.current.scrollIntoView({behaviour:"smooth"}) // scrolling to the end of the chat
-    },[])
+    },[chat?.messages])
 
     // Getting the chat from firestore database
      useEffect(() =>
@@ -85,15 +82,17 @@ const Chat = () =>
         }
 
         // if the text is empty, return
-        if(text.trim() === "" && !sendimg.file) return;
+        if(text.trim() === "" ) return;
 
         // updating the chat in firestore
         try{
-        let imgUrl = null;
-        if(sendimg.file)
-            {
-                imgUrl = await upload(sendimg.file)
-            }            
+        // let imgUrl = null;
+        // if(sendimg.file)
+        //     {
+        //         console.log("Starting image upload...");
+        //         imgUrl = await upload(sendimg.file)
+        //         console.log("Image uploaded successfully:", imgUrl);
+        //     }            
 
             await updateDoc(doc(db,"chats" ,chatId) ,
         {
@@ -102,15 +101,15 @@ const Chat = () =>
                 senderId: currentUser.id, // sender id
                 text, // message text
                 createdAt:new Date(), // created at time
-                ...(imgUrl && {img: imgUrl})
+                // ...(imgUrl && {img: imgUrl})
             })
         });
 
         // clearing the image state
-        setSendimg({
-            file:null,
-            url:""
-        }) 
+        // setSendimg({
+        //     file:null,
+        //     url:""
+        // }) 
 
         setText("") // clear input after sending the message
         
@@ -159,14 +158,7 @@ const Chat = () =>
     }
         catch(err)
         {
-            console.log("Error sending message: ",
-                {
-                    error:err,
-                    chatId,
-                    currentUser: currentUser?.id,
-                    user: user?.id
-                }
-            );
+            console.error("Upload error of Image: ", err);
         }
     }
 
@@ -178,17 +170,46 @@ const Chat = () =>
     }
 
     // Handling image
-    const handleImage = (e) =>
+    const handleImage = async(e) =>
         {
+            const file = e.target.files[0]
             // if the file is selected , set the avatar state to the file and the url to the file
-            if(e.target.files[0]) // first file in the array
+            if(file) // first file in the array
             {
-                setSendimg(
+
+                try {
+                    console.log("Starting image upload...");
+                    setUploadProgress(0);
+                    
+                    const imgUrl = await upload(file,(progress) =>
                     {
-                        file: e.target.files[0], // file is the selected file
-                        url:URL.createObjectURL(e.target.files[0]) // URL.createObjectURL is used to create a URL for the selected file , to display the image
-                    }
-                )
+                        console.log("Upload progress: ",progress);
+                        setUploadProgress(progress);
+                    }); // Upload directly when file is selected
+                    console.log("Image URL:", imgUrl);
+                    setUploadProgress(0);
+        
+                    // Send message with image immediately
+                    await updateDoc(doc(db, "chats", chatId), {
+                        messages: arrayUnion({
+                            senderId: currentUser.id,
+                            img: imgUrl,
+                            createdAt: new Date()
+                        })
+                    });
+                    setUploadProgress(0)
+                } catch (err) {
+                    console.error("Error uploading image:", err);
+                    setUploadProgress(0);
+                }
+
+                // ----------------------------------------------------------------------
+                // setSendimg(
+                //     {
+                //         file: e.target.files[0], // file is the selected file
+                //         url:URL.createObjectURL(e.target.files[0]) // URL.createObjectURL is used to create a URL for the selected file , to display the image
+                //     }
+                // )
 
             }
         }
@@ -204,6 +225,7 @@ const Chat = () =>
         }
     }
 
+    console.log("Upload Progress: " , uploadProgress)
     return (
         // chat main container starts
         <div className="chat">
@@ -225,31 +247,47 @@ const Chat = () =>
             <div className="center">
                 {chat?.messages?.map((message) =>
                 (  
-                    <div className={`chat-message ${message.senderId === currentUser.id ? "own" : ""}`} key={message.createdAt}>
+                    <div className={`chat-message ${message.senderId === currentUser.id ? "own" : "chat-message"}`} key={message.createdAt}>
                         <div className="chat-texts">
                             {message.img && 
                             (
                             <img src={message.img} className='sender-image' alt='message-image'/>)}
-                            {message.text && <p className="own-text">{message.text}</p>}
+                            {message.text && <p className={`${message.senderId === currentUser.id ? "own-text": "sender-text"}`}>{message.text}</p>}
                             
                             {/* <span>{message}</span> */}
                         </div>
                 </div>
                 ))}
+            {/* endRef for scrolling to the end of the chat */}
+                    <div ref={endRef}></div>    
             </div>
-            {/* Center class ends */}
+            {/* Center class ends */}   
 
-           {sendimg?.url && 
+           {/* {sendimg?.url && 
            (
            <div className="chat-message own">
                 <div className="chat-texts">
                     <img src={sendimg.url} alt='image-icon' className="sender-image"/>
                 </div>
             </div>
-            )}
+            )} */}
 
-            {/* endRef for scrolling to the end of the chat */}
-            <div ref={endRef}></div>    
+            {uploadProgress > 0 && uploadProgress < 100 &&
+            (
+                // <div class="loader8">
+                // </div>
+                <div className="upload-progress-container">
+                <div className="upload-progress">
+                    <div className="progress-bar">
+                        <div 
+                            className="progress-fill"
+                            style={{ width: `${uploadProgress}%` }}
+                        />
+                    </div>
+                    <span>{Math.round(uploadProgress)}%</span>
+                </div>
+            </div>
+            )}
 
             {/* bottom class starts */}
             <div className="bottom">
