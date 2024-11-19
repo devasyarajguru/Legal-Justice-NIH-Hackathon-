@@ -61,19 +61,38 @@
 {
     flex:1;
     /* height: 510px; */
+    /* gap: 20px; */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
     padding: 20px;
+    position: relative;
+}
+
+.image-preview {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(245, 245, 245, 0.9);
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #ddd;
+}
+
+.image-preview img {
+    max-height: 150px;
+    object-fit: contain;
+    border-radius: 8px;
 }
 
 .chat-message
 {
     max-width: 70%;
     display: flex;
-    gap: 20px;
-    padding: 10px;
+    gap: 20px;  
+    /* padding: 10px; */
 }
 
 .chat-message.own
@@ -187,6 +206,80 @@ font-size: 16px;
     object-fit: cover;
 }
 
+/* .loader8 {
+    width: 250px;
+    height: 16px;
+    border: 1px solid #bbb;
+    border-radius: 0px;
+    position: relative;
+    overflow: hidden;
+    background: #E6E6E6;
+    margin: 5px;
+  }
+  
+  .loader8:after {
+    content: " ";
+    display: block;
+    width: 120px;
+    top: -50%;
+    height: 250%;
+    position: absolute;
+    animation: greenglow 3s linear infinite;
+    z-index: 2;
+    background: #1CAE30;
+  }
+  
+  @keyframes greenglow {
+    from {
+      left: -120px;
+    }
+  
+    to {
+      left: 100%;
+    }
+  } */
+  
+
+.upload-progress-container {
+    position: fixed; /* or absolute, depending on your layout */
+    bottom: 100px;  /* Adjust this value to position above your chat input */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 500px;
+    z-index: 1000; /* Ensure it's above other elements */
+    background: white; /* Background color */
+    padding: 15px; /* Padding for aesthetics */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+}
+
+.upload-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between progress bar and percentage */
+}
+
+.progress-bar {
+    flex: 1; /* Take up remaining space */
+    height: 8px; /* Height of the progress bar */
+    background: #e0e0e0; /* Background color of the bar */
+    border-radius: 4px; /* Rounded corners */
+    overflow: hidden; /* Hide overflow */
+}
+
+.progress-fill {
+    height: 100%; /* Fill the height of the bar */
+    background: #4F5DFC; /* Color of the progress fill */
+    transition: width 0.3s ease; /* Smooth transition */
+}
+
+.upload-progress span {
+    min-width: 45px; /* Minimum width for the percentage text */
+    font-size: 14px; /* Font size */
+    color: #333; /* Text color */
+}
+  
 
 
 
