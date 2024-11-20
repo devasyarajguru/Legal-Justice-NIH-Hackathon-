@@ -10,7 +10,8 @@ import { doc, onSnapshot, updateDoc ,arrayUnion , getDoc } from 'firebase/firest
 import { db } from '../lib/firebase';
 import { chatStore } from '../lib/chatStore';
 import { useUserStore } from '../lib/userStore';
-import upload from '../lib/upload';
+import axios from 'axios'
+import ProgressBar from './ProgressBar';
 
 // 2:46:22
 const Chat = () =>
@@ -180,14 +181,28 @@ const Chat = () =>
                 try {
                     console.log("Starting image upload...");
                     setUploadProgress(0);
+
+                    const totalChunks = 10; // Number of chunks to simulate
+                    for (let i = 0; i <= totalChunks; i++) {
+                        await new Promise((resolve) => setTimeout(resolve, 300)); // Simulate delay
+                        setUploadProgress((i / totalChunks) * 100); // Update progress
+                    }
                     
-                    const imgUrl = await upload(file,(progress) =>
-                    {
-                        console.log("Upload progress: ",progress);
-                        setUploadProgress(progress);
-                    }); // Upload directly when file is selected
-                    console.log("Image URL:", imgUrl);
-                    setUploadProgress(0);
+                   const formData = new FormData();
+                   formData.append('file' , file);
+
+                   const response = await axios.post('http://localhost:3000/upload', formData, {
+                       headers: {
+                           'Content-Type': 'multipart/form-data'
+                       },
+                       onUploadProgress: (progressEvent) => {
+                           const { loaded, total } = progressEvent;
+                           const percent = Math.floor((loaded * 100) / total);
+                           setUploadProgress(percent);
+                       }
+                   });
+
+                   const imgUrl = response.data.url
         
                     // Send message with image immediately
                     await updateDoc(doc(db, "chats", chatId), {
@@ -225,7 +240,7 @@ const Chat = () =>
         }
     }
 
-    console.log("Upload Progress: " , uploadProgress)
+    // console.log("Upload Progress: " , uploadProgress)
     return (
         // chat main container starts
         <div className="chat">
@@ -249,9 +264,14 @@ const Chat = () =>
                 (  
                     <div className={`chat-message ${message.senderId === currentUser.id ? "own" : "chat-message"}`} key={message.createdAt}>
                         <div className="chat-texts">
-                            {message.img && 
-                            (
-                            <img src={message.img} className='sender-image' alt='message-image'/>)}
+                            {message.img && (
+                                <div className="image-container">
+                                    <img src={message.img} className='sender-image' alt='message-image' />
+                                    {uploadProgress > 0 && uploadProgress < 100 && (
+                                        <ProgressBar progress={uploadProgress} />
+                                    )}
+                                </div>
+                            )}
                             {message.text && <p className={`${message.senderId === currentUser.id ? "own-text": "sender-text"}`}>{message.text}</p>}
                             
                             {/* <span>{message}</span> */}
@@ -272,21 +292,8 @@ const Chat = () =>
             </div>
             )} */}
 
-            {uploadProgress > 0 && uploadProgress < 100 &&
-            (
-                // <div class="loader8">
-                // </div>
-                <div className="upload-progress-container">
-                <div className="upload-progress">
-                    <div className="progress-bar">
-                        <div 
-                            className="progress-fill"
-                            style={{ width: `${uploadProgress}%` }}
-                        />
-                    </div>
-                    <span>{Math.round(uploadProgress)}%</span>
-                </div>
-            </div>
+            {uploadProgress > 0 && uploadProgress < 100 && (
+                <ProgressBar progress={uploadProgress} />
             )}
 
             {/* bottom class starts */}
