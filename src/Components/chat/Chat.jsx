@@ -6,12 +6,13 @@ import camera from './assets/camera.png';
 import mic from './assets/mic.png';
 import EmojiPicker from 'emoji-picker-react';
 import {useRef, useState , useEffect} from 'react'
-import { doc, onSnapshot, updateDoc ,arrayUnion , getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc ,arrayUnion , getDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { chatStore } from '../lib/chatStore';
 import { useUserStore } from '../lib/userStore';
 import axios from 'axios'
-import ProgressBar from './ProgressBar';
+// import ProgressBar from './ProgressBar';
+import upload from '../lib/upload';
 
 // 2:46:22
 const Chat = () =>
@@ -31,7 +32,9 @@ const Chat = () =>
     // Input text state
     const [text,setText] = useState("")
 
-    const [uploadProgress,setUploadProgress] = useState(0)
+    // const [uploadProgress,setUploadProgress] = useState(0)
+
+    const [menuVisible , setMenuVisible] = useState(null);
 
     const endRef = useRef(null) // endRef for scrolling to the end of the chat
 
@@ -60,6 +63,12 @@ const Chat = () =>
         unSub();
     };
     },[chatId])
+
+    // 
+    const toggleMenu = (messageId) =>
+    {
+        
+    }
 
     // Handling Send button
     const handleSend = async () =>
@@ -180,30 +189,10 @@ const Chat = () =>
 
                 try {
                     console.log("Starting image upload...");
-                    setUploadProgress(0);
+                    // setUploadProgress(0);
 
-                    const totalChunks = 10; // Number of chunks to simulate
-                    for (let i = 0; i <= totalChunks; i++) {
-                        await new Promise((resolve) => setTimeout(resolve, 300)); // Simulate delay
-                        setUploadProgress((i / totalChunks) * 100); // Update progress
-                    }
-                    
-                   const formData = new FormData();
-                   formData.append('file' , file);
+                    const imgUrl = await upload(file);
 
-                   const response = await axios.post('http://localhost:3000/upload', formData, {
-                       headers: {
-                           'Content-Type': 'multipart/form-data'
-                       },
-                       onUploadProgress: (progressEvent) => {
-                           const { loaded, total } = progressEvent;
-                           const percent = Math.floor((loaded * 100) / total);
-                           setUploadProgress(percent);
-                       }
-                   });
-
-                   const imgUrl = response.data.url
-        
                     // Send message with image immediately
                     await updateDoc(doc(db, "chats", chatId), {
                         messages: arrayUnion({
@@ -212,10 +201,10 @@ const Chat = () =>
                             createdAt: new Date()
                         })
                     });
-                    setUploadProgress(0)
+                    // setUploadProgress(0)
                 } catch (err) {
                     console.error("Error uploading image:", err);
-                    setUploadProgress(0);
+                    // setUploadProgress(0);
                 }
 
                 // ----------------------------------------------------------------------
@@ -240,7 +229,33 @@ const Chat = () =>
         }
     }
 
+    // Handling of Deleting the messages
+    const handleDeleteMessage = async (message) =>
+        {
+            if(message.senderId !== currentUser.id)
+            {
+                console.log("Delete only your msg")
+            }
+
+            try 
+            {
+                await updateDoc(doc(db, "chats" ,chatId),{
+                    messages: arrayRemove(message)
+                })
+
+                console.log("Message deleted successfully.");
+            }
+
+            catch(err)
+            {
+                console.error("Error deleting message:", error);
+            }
+        }
+
+
     // console.log("Upload Progress: " , uploadProgress)
+   
+
     return (
         // chat main container starts
         <div className="chat">
@@ -267,14 +282,13 @@ const Chat = () =>
                             {message.img && (
                                 <div className="image-container">
                                     <img src={message.img} className='sender-image' alt='message-image' />
-                                    {uploadProgress > 0 && uploadProgress < 100 && (
+                                    {/* {uploadProgress > 0 && uploadProgress < 100 && (
                                         <ProgressBar progress={uploadProgress} />
-                                    )}
+                                    )} */}
                                 </div>
                             )}
                             {message.text && <p className={`${message.senderId === currentUser.id ? "own-text": "sender-text"}`}>{message.text}</p>}
                             
-                            {/* <span>{message}</span> */}
                         </div>
                 </div>
                 ))}
@@ -291,10 +305,9 @@ const Chat = () =>
                 </div>
             </div>
             )} */}
-
-            {uploadProgress > 0 && uploadProgress < 100 && (
+            {/* {uploadProgress > 0 && uploadProgress < 100 && (
                 <ProgressBar progress={uploadProgress} />
-            )}
+            )} */}
 
             {/* bottom class starts */}
             <div className="bottom">
