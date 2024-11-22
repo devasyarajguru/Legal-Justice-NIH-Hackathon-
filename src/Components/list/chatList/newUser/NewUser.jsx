@@ -12,6 +12,7 @@ const NewUser = () =>
     const [searchTerm,setSearchTerm] = useState("") // New State for search term
     const [allUsers,setAllUsers] = useState([]) // New State for all users
     const {currentUser} = useUserStore() // current user from UserStore
+    const [isActive,setIsActive] = useState(false);
 
     // Fetching all users when component mounts
     useEffect(()=>
@@ -42,6 +43,23 @@ const NewUser = () =>
 
         fetchUsers() // Calling the fetchUsers function
     },[currentUser.id]);
+
+    useEffect(() =>
+    {
+        const handleClickOutside = (e) =>
+        {
+            if(!e.target.closest(".search-container"))
+            {
+                setIsActive(false)
+            }
+        }
+
+        document.addEventListener("mousedown" , handleClickOutside)
+        return () =>
+        {
+            document.removeEventListener("mousedown" , handleClickOutside)
+        }
+    },[])
 
     //filter users based on search term
     // ? - optional chaining operator. If user is null , then it will not throw an error and will return undefined
@@ -153,12 +171,14 @@ const NewUser = () =>
                     type="text" 
                     placeholder="Search username..." 
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onClick={() => setIsActive(true)}
+                    onFocus={() => setIsActive(true)}
                 />
                 
                 {/* Show filtered results directly with Add button */}
-                {searchTerm && (
+                {searchTerm && isActive &&(
                     <div className="search-results">
                         {filteredUsers.map(filteredUser => (
                             <div key={filteredUser.id} className="new-user">
