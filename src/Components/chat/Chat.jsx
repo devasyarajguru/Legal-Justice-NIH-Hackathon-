@@ -10,9 +10,8 @@ import { doc, onSnapshot, updateDoc ,arrayUnion , getDoc, arrayRemove } from 'fi
 import { db } from '../lib/firebase';
 import { chatStore } from '../lib/chatStore';
 import { useUserStore } from '../lib/userStore';
-import axios from 'axios'
-// import ProgressBar from './ProgressBar';
 import upload from '../lib/upload';
+import AlertDialog from './AlertDialog'; // Import the AlertDialog component
 
 // 2:46:22
 const Chat = () =>
@@ -32,12 +31,12 @@ const Chat = () =>
     // Input text state
     const [text,setText] = useState("")
 
-    // const [uploadProgress,setUploadProgress] = useState(0)
-
-    const [menuVisible , setMenuVisible] = useState(null);
 
     const endRef = useRef(null) // endRef for scrolling to the end of the chat
 
+    const [dialogOpen, setDialogOpen] = useState(false); // State to manage dialog visibility
+    const [messageToDelete, setMessageToDelete] = useState(null); // State to hold the message to delete
+    const [dialogMessage, setDialogMessage] = useState(''); // New state for dialog message
 
     useEffect(() =>
     {
@@ -47,13 +46,11 @@ const Chat = () =>
     // Getting the chat from firestore database
      useEffect(() =>
     {
-        console.log("ChatId: ",chatId); 
         if (!chatId) return;
         // getting the chat from firestore database
         const unSub = onSnapshot(doc(db,"chats",chatId),
         (res) =>
         {
-            console.log("Chat Data: ",res.data());
             setChat(res.data()); // setting the chat state with the chat data from firestore
         }
     );
@@ -64,46 +61,16 @@ const Chat = () =>
     };
     },[chatId])
 
-    // 
-    const toggleMenu = (messageId) =>
-    {
-        
-    }
-
     // Handling Send button
     const handleSend = async () =>
     {
         // if the chatId, user or currentUser is not found, return
-        if (!chatId || !user || !currentUser?.id) {
+        if (!chatId || !user || !currentUser?.id || text.trim() === "") {
             return;
         }
-    
-        // Use the correct user ID property
-        const userId = user.id || user.uid; // Sometimes Firebase uses 'uid' instead of 'id'
-    
-        if (!userId) {
-            console.error("No user ID found in user object:", user);
-            return;
-        }
-    
-        if (!currentUser?.id) {
-            console.error("Missing currentUser ID");
-            return;
-        }
-
-        // if the text is empty, return
-        if(text.trim() === "" ) return;
 
         // updating the chat in firestore
-        try{
-        // let imgUrl = null;
-        // if(sendimg.file)
-        //     {
-        //         console.log("Starting image upload...");
-        //         imgUrl = await upload(sendimg.file)
-        //         console.log("Image uploaded successfully:", imgUrl);
-        //     }            
-
+        try{         
             await updateDoc(doc(db,"chats" ,chatId) ,
         {
             // adding the message to the chat
@@ -114,12 +81,6 @@ const Chat = () =>
                 // ...(imgUrl && {img: imgUrl})
             })
         });
-
-        // clearing the image state
-        // setSendimg({
-        //     file:null,
-        //     url:""
-        // }) 
 
         setText("") // clear input after sending the message
         
@@ -168,7 +129,7 @@ const Chat = () =>
     }
         catch(err)
         {
-            console.error("Upload error of Image: ", err);
+            console.error("Error sending messages:", err);
         }
     }
 
@@ -188,9 +149,6 @@ const Chat = () =>
             {
 
                 try {
-                    console.log("Starting image upload...");
-                    // setUploadProgress(0);
-
                     const imgUrl = await upload(file);
 
                     // Send message with image immediately
@@ -201,20 +159,9 @@ const Chat = () =>
                             createdAt: new Date()
                         })
                     });
-                    // setUploadProgress(0)
                 } catch (err) {
                     console.error("Error uploading image:", err);
-                    // setUploadProgress(0);
                 }
-
-                // ----------------------------------------------------------------------
-                // setSendimg(
-                //     {
-                //         file: e.target.files[0], // file is the selected file
-                //         url:URL.createObjectURL(e.target.files[0]) // URL.createObjectURL is used to create a URL for the selected file , to display the image
-                //     }
-                // )
-
             }
         }
 
@@ -227,34 +174,35 @@ const Chat = () =>
             e.preventDefault();
             handleSend();
         }
-    }
+    }   
 
-    // Handling of Deleting the messages
-    const handleDeleteMessage = async (message) =>
-        {
-            if(message.senderId !== currentUser.id)
-            {
-                console.log("Delete only your msg")
-            }
-
-            try 
-            {
-                await updateDoc(doc(db, "chats" ,chatId),{
-                    messages: arrayRemove(message)
-                })
-
-                console.log("Message deleted successfully.");
-            }
-
-            catch(err)
-            {
-                console.error("Error deleting message:", error);
-            }
+    const handleClickOpen = (message) => {
+        setMessageToDelete(message); // Store the actual message object
+        if (message.img) {
+            setDialogMessage("Are you sure you want to delete this message?"); // Generic message for images
+        } else {
+            setDialogMessage(`Are you sure you want to delete this message: "${message.text}"?`); // Message for text
         }
+        setDialogOpen(true); // Open the dialog
+    };
 
+    const handleClose = () => {
+        setDialogOpen(false); // Close the dialog
+    };
 
-    // console.log("Upload Progress: " , uploadProgress)
-   
+    const handleDeleteMessage = async () => {
+        if (!messageToDelete) return; 
+        console.log("Function invoked!")
+        try {
+            await updateDoc(doc(db, "chats", chatId), {
+                messages: arrayRemove(messageToDelete) // Remove the specific message
+            });
+            console.log("Message deleted successfully.");
+            handleClose(); // Close the dialog after deletion
+        } catch (error) {
+            console.error("Error deleting message:", error);
+        }
+    };
 
     return (
         // chat main container starts
@@ -275,39 +223,45 @@ const Chat = () =>
 
             {/* Center class starts */}
             <div className="center">
-                {chat?.messages?.map((message) =>
-                (  
+                {chat?.messages?.map((message) => (
                     <div className={`chat-message ${message.senderId === currentUser.id ? "own" : "chat-message"}`} key={message.createdAt}>
                         <div className="chat-texts">
                             {message.img && (
                                 <div className="image-container">
                                     <img src={message.img} className='sender-image' alt='message-image' />
-                                    {/* {uploadProgress > 0 && uploadProgress < 100 && (
-                                        <ProgressBar progress={uploadProgress} />
-                                    )} */}
+                                    <span className='three-dots' onClick={() => handleClickOpen(message)}>...</span>
                                 </div>
                             )}
-                            {message.text && <p className={`${message.senderId === currentUser.id ? "own-text": "sender-text"}`}>{message.text}</p>}
-                            
+                            {message.text && (
+                                <div className="text-container">
+                                    {message.senderId === currentUser.id ? (
+                                        <>
+                                            <span className='three-dots own' onClick={() => handleClickOpen(message)}>...</span>
+                                            <p className="own-text">{message.text}</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className="sender-text">{message.text}</p>
+                                            <span className='three-dots sender  ' onClick={() => handleClickOpen(message)}>...</span>
+                                        </>
+                                    )}   
+                                </div>
+                            )}
                         </div>
-                </div>
+                    </div>
                 ))}
-            {/* endRef for scrolling to the end of the chat */}
-                    <div ref={endRef}></div>    
+                {/* endRef for scrolling to the end of the chat */}
+                <div ref={endRef}></div>
+
+                {/* Confirmation Dialog */}
+                <AlertDialog
+                    open={dialogOpen}
+                    handleClose={handleClose}
+                    handleDelete={handleDeleteMessage}
+                    message={dialogMessage}
+                />
             </div>
             {/* Center class ends */}   
-
-           {/* {sendimg?.url && 
-           (
-           <div className="chat-message own">
-                <div className="chat-texts">
-                    <img src={sendimg.url} alt='image-icon' className="sender-image"/>
-                </div>
-            </div>
-            )} */}
-            {/* {uploadProgress > 0 && uploadProgress < 100 && (
-                <ProgressBar progress={uploadProgress} />
-            )} */}
 
             {/* bottom class starts */}
             <div className="bottom">
