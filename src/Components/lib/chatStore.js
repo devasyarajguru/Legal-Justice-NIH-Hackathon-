@@ -14,7 +14,7 @@ import { useUserStore } from "./userStore";
     {
 
         console.log("ChatStore changeChat called with:", {
-            chatId,
+            chatId,  
             user,
             userId: user?.id
         });
