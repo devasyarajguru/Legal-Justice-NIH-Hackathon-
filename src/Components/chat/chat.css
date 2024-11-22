@@ -44,7 +44,6 @@
     font-size: 31px;
     color: #4F5DFC;
     font-family: sans-serif;
-    font-style: normal;
 }
 
 .user-texts p
@@ -54,7 +53,6 @@
     margin-top: -1px;
     font-family: sans-serif;
     color: #0CCC36;
-    font-style: normal;
 }
 
 .center
@@ -69,26 +67,9 @@
     position: relative;
 }
 
-.image-preview {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(245, 245, 245, 0.9);
-    padding: 10px;
-    display: flex;
-    justify-content: center;
-    border-top: 1px solid #ddd;
-}
-
-.image-preview img {
-    max-height: 150px;
-    object-fit: contain;
-    border-radius: 8px;
-}
-
 .chat-message
 {
+    position: relative;
     max-width: 70%;
     display: flex;
     gap: 20px;  
@@ -107,6 +88,7 @@
     color: #F2F2F2;
     border-radius: 10px;
     padding: 10px;
+    margin-left: auto;
 }
 
 .own-text
@@ -116,6 +98,7 @@
     color: #F2F2F2;
     border-radius: 10px;
     padding: 10px;
+    margin-right: auto;
 }
 
 .bottom
@@ -196,6 +179,8 @@ font-size: 16px;
 .chat-texts
 {
     font-family: sans-serif;
+    display: flex;
+    align-items: center;
 }
 
 .sender-image
@@ -206,93 +191,65 @@ font-size: 16px;
     object-fit: cover;
 }
 
-/* .loader8 {
-    width: 250px;
-    height: 16px;
-    border: 1px solid #bbb;
-    border-radius: 0px;
+.three-dots {
+    cursor: pointer;
+    /* margin-left: 10px; */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.chat-message:hover .three-dots {
+    opacity: 1;
+}
+
+.chat-message {
     position: relative;
-    overflow: hidden;
-    background: #E6E6E6;
-    margin: 5px;
-  }
-  
-  .loader8:after {
-    content: " ";
-    display: block;
-    width: 120px;
-    top: -50%;
-    height: 250%;
-    position: absolute;
-    animation: greenglow 3s linear infinite;
-    z-index: 2;
-    background: #1CAE30;
-  }
-  
-  @keyframes greenglow {
-    from {
-      left: -120px;
-    }
-  
-    to {
-      left: 100%;
-    }
-  } */
-  
-
-.upload-progress-container {
-    position: fixed; /* or absolute, depending on your layout */
-    bottom: 100px;  /* Adjust this value to position above your chat input */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 500px;
-    z-index: 1000; /* Ensure it's above other elements */
-    background: white; /* Background color */
-    padding: 15px; /* Padding for aesthetics */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    /* margin: 8px 0; */
 }
 
-.upload-progress {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* Space between progress bar and percentage */
+.chat-texts {
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
 }
 
-.progress-bar {
-    flex: 1; /* Take up remaining space */
-    height: 8px; /* Height of the progress bar */
-    background: #e0e0e0; /* Background color of the bar */
-    border-radius: 4px; /* Rounded corners */
-    overflow: hidden; /* Hide overflow */
+.image-container {
+    position: relative; /* Position relative for the three dots */
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
 }
 
-.progress-fill {
-    height: 100%; /* Fill the height of the bar */
-    background: #4F5DFC; /* Color of the progress fill */
-    transition: width 0.3s ease; /* Smooth transition */
+.text-container {
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
 }
 
-.upload-progress span {
-    min-width: 45px; /* Minimum width for the percentage text */
-    font-size: 14px; /* Font size */
-    color: #333; /* Text color */
+.own-text {
+    margin: 1px;
+    margin-right: auto; /* Push the own text to the left */
 }
-  
 
+.sender-text {
+    margin: 1px;
+    margin-left: auto; /* Push the sender text to the right */
+}
 
+.three-dots {
+    cursor: pointer;
+    /* margin-left: 10px;  */
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.3s; /* Smooth transition for visibility */
+}
 
+.three-dots.own
+{
+    margin-right: 5px;
+}
 
+.three-dots.sender
+{
+    margin-left: 5px;
+}
 
-
-
-
-
-
-
-
-
-
-
-
+.chat-message:hover.three-dots {
+    opacity: 1; /* Show dots on hover */
+}
