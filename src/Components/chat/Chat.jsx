@@ -13,7 +13,7 @@ import { useUserStore } from '../lib/userStore';
 import upload from '../lib/upload';
 import AlertDialog from './AlertDialog'; // Import the AlertDialog component
 
-// 2:46:22
+// Testing commits
 const Chat = () =>
 { 
     // Getting the current user from userStore
