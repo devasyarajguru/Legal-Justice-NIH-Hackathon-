@@ -141,14 +141,17 @@ const Chat = () =>
     }
 
     // Handling image
-    const handleImage = async(e) =>
+    const handleFileUpload = async(e) =>
         {
             const file = e.target.files[0]
             // if the file is selected , set the avatar state to the file and the url to the file
             if(file) // first file in the array
             {
-
+                const fileType = file.type; // file.type returns a string that represents the media type of the file. 
                 try {
+                    if(fileType.startsWith('image/'))
+                    {
+
                     const imgUrl = await upload(file);
 
                     // Send message with image immediately
@@ -159,7 +162,29 @@ const Chat = () =>
                             createdAt: new Date()
                         })
                     });
-                } catch (err) {
+                }
+
+                else if(fileType === 'application/pdf' || fileType === 'application/msword' || fileType === 'application/vmd.openxmlformats-officedocument.wordprocessingml.document')
+
+                     //Last one handles the .docx file upload 
+                {
+                    const docUrl = await upload(file);
+                    await updateDoc(doc(db,"chats",chatId),
+                {
+                    messages: arrayUnion({
+                        senderId: currentUser.id,
+                        doc: docUrl, // Store the document URL
+                        createdAt: new Date()
+                })
+                })
+                console.log("Successfull file upload")
+            }
+                else{
+                    console.log("Error uploading file: " , err)
+                    alert("Unsupported file type");
+                }
+            } 
+                catch (err) {
                     console.error("Error uploading image:", err);
                 }
             }
@@ -232,6 +257,16 @@ const Chat = () =>
                                     <span className='three-dots' onClick={() => handleClickOpen(message)}>...</span>
                                 </div>
                             )}
+                            {message.doc && (
+                                <div className="document-container">
+                                    <a href={message.doc} target='_blank' rel='noopener noreferrer'>
+                                        {message.doc.split('/').pop()}
+                                    </a>
+                                    <span className='three-dots' onClick={() => handleClickOpen(message)}>...</span>
+                                </div>
+                            )
+
+                            }
                             {message.text && (
                                 <div className="text-container">
                                     {message.senderId === currentUser.id ? (
@@ -270,7 +305,7 @@ const Chat = () =>
                     <label htmlFor='file'>
                         <img src={img} alt='image-icon'/>
                     </label>
-                        <input type='file' id="file" style={{display:"none"}} onChange={handleImage}/>
+                        <input type='file' id="file" style={{display:"none"}} onChange={handleFileUpload} accept="image/*,.pdf,.doc,.docx,.txt"/>
                         <img src={camera} alt='camera-icon'/>
                         <img src={mic} alt='mic-icon'/>
                 </div>
