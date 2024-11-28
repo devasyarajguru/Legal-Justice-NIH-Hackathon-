@@ -7,11 +7,15 @@ import mic from './assets/mic.png';
 import EmojiPicker from 'emoji-picker-react';
 import {useRef, useState , useEffect} from 'react'
 import { doc, onSnapshot, updateDoc ,arrayUnion , getDoc, arrayRemove } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, storage } from '../lib/firebase';
 import { chatStore } from '../lib/chatStore';
 import { useUserStore } from '../lib/userStore';
 import upload from '../lib/upload';
 import AlertDialog from './AlertDialog'; // Import the AlertDialog component
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import DocumentIcon from '../../assets/document.png'; // Correct path to import the document icon
+import { toast } from 'react-toastify';
+import Notification from '../Notification'
 
 // Testing commits
 const Chat = () =>
@@ -148,10 +152,11 @@ const Chat = () =>
             if(file) // first file in the array
             {
                 const fileType = file.type; // file.type returns a string that represents the media type of the file. 
+                const userId = currentUser.uid;
+                const storageRef = ref(storage, `images/${userId}/${file.name}`); // reference to where the file should be stored in the storage
                 try {
                     if(fileType.startsWith('image/'))
                     {
-
                     const imgUrl = await upload(file);
 
                     // Send message with image immediately
@@ -162,13 +167,15 @@ const Chat = () =>
                             createdAt: new Date()
                         })
                     });
+                    console.log("Image uploaded successfully")
                 }
 
                 else if(fileType === 'application/pdf' || fileType === 'application/msword' || fileType === 'application/vmd.openxmlformats-officedocument.wordprocessingml.document')
 
                      //Last one handles the .docx file upload 
                 {
-                    const docUrl = await upload(file);
+                    await uploadBytes(storageRef, file); // uploadBytes is used to upload a file to Firebase Storage , it's a part of Storage SDK
+                    const docUrl = await getDownloadURL(storageRef); // It retreives the download URL for the file that was just uploaded to Firebase Storage
                     await updateDoc(doc(db,"chats",chatId),
                 {
                     messages: arrayUnion({
@@ -177,16 +184,19 @@ const Chat = () =>
                         createdAt: new Date()
                 })
                 })
-                console.log("Successfull file upload")
+                toast.success("Successfull file upload")
             }
                 else{
-                    console.log("Error uploading file: " , err)
-                    alert("Unsupported file type");
+                    toast.error("Error uploading file: " , err)
                 }
             } 
                 catch (err) {
-                    console.error("Error uploading image:", err);
+                    toast.error("Error uploading image:", err);
                 }
+            }
+        else
+            {
+                toast.error("No file selected")
             }
         }
 
@@ -229,8 +239,11 @@ const Chat = () =>
         }
     };
 
+
     return (
-        // chat main container starts
+        <>
+        <Notification />
+        {/* // chat main container starts */}
         <div className="chat">
             {/* top class starts */}
             <div className="top">
@@ -248,43 +261,46 @@ const Chat = () =>
 
             {/* Center class starts */}
             <div className="center">
-                {chat?.messages?.map((message) => (
-                    <div className={`chat-message ${message.senderId === currentUser.id ? "own" : "chat-message"}`} key={message.createdAt}>
-                        <div className="chat-texts">
-                            {message.img && (
-                                <div className="image-container">
-                                    <img src={message.img} className='sender-image' alt='message-image' />
-                                    <span className='three-dots' onClick={() => handleClickOpen(message)}>...</span>
-                                </div>
-                            )}
-                            {message.doc && (
-                                <div className="document-container">
-                                    <a href={message.doc} target='_blank' rel='noopener noreferrer'>
-                                        {message.doc.split('/').pop()}
-                                    </a>
-                                    <span className='three-dots' onClick={() => handleClickOpen(message)}>...</span>
-                                </div>
-                            )
-
-                            }
-                            {message.text && (
-                                <div className="text-container">
-                                    {message.senderId === currentUser.id ? (
-                                        <>
-                                            <span className='three-dots own' onClick={() => handleClickOpen(message)}>...</span>
-                                            <p className="own-text">{message.text}</p>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <p className="sender-text">{message.text}</p>
-                                            <span className='three-dots sender  ' onClick={() => handleClickOpen(message)}>...</span>
-                                        </>
-                                    )}   
-                                </div>
-                            )}
+                {chat?.messages?.map((message) => {
+                    console.log("Message:",message); // Log the message object to inspect its structure
+                    return (
+                        <div className={`chat-message ${message.senderId === currentUser.id ? "own" : "chat-message"}`} key={message.createdAt}>
+                            <div className="chat-texts">
+                                {message.img && (
+                                    <div className="image-container">
+                                        <img src={message.img} className='sender-image' alt='User uploaded image' />
+                                        <span className='three-dots' onClick={() => handleClickOpen(message)}>...</span>
+                                    </div>
+                                )}
+                                {message.doc && (
+                                    <div className="document-container">
+                                        <a href={message.doc} target='_blank' rel='noopener noreferrer' className='document-link'>
+                                            <img src={DocumentIcon} alt='Document Icon' className='document-icon' />
+                                            <span className='doc-msg'>{message.doc.split('/').pop()}</span> 
+                                            {/* Display only the file name */}
+                                        </a>
+                                        <span className='three-dots' onClick={() => handleClickOpen(message)}>...</span>
+                                    </div>
+                                )}
+                                {message.text && (
+                                    <div className="text-container">
+                                        {message.senderId === currentUser.id ? (
+                                            <>
+                                                <span className='three-dots own' onClick={() => handleClickOpen(message)}>...</span>
+                                                <p className="own-text">{message.text}</p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <p className="sender-text">{message.text}</p>
+                                                <span className='three-dots sender' onClick={() => handleClickOpen(message)}>...</span>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
                 {/* endRef for scrolling to the end of the chat */}
                 <div ref={endRef}></div>
 
@@ -328,8 +344,8 @@ const Chat = () =>
     
 
         </div>
-        // chat main container ends
-
+        {/* // chat main container ends */}
+        </>
     )
 }
 
