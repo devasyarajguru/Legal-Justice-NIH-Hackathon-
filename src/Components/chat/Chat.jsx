@@ -152,8 +152,15 @@ const Chat = () =>
             if(file) // first file in the array
             {
                 const fileType = file.type; // file.type returns a string that represents the media type of the file. 
-                const userId = currentUser.uid;
+                const userId = currentUser?.id;
+                if(!userId)
+                {
+                    toast.error("User is not authenticated")
+                    console.error("User not authenticated!")
+                    return;
+                }
                 const storageRef = ref(storage, `images/${userId}/${file.name}`); // reference to where the file should be stored in the storage
+                    console.log("Storage reference: ",storageRef)
                 try {
                     if(fileType.startsWith('image/'))
                     {
@@ -176,6 +183,7 @@ const Chat = () =>
                 {
                     await uploadBytes(storageRef, file); // uploadBytes is used to upload a file to Firebase Storage , it's a part of Storage SDK
                     const docUrl = await getDownloadURL(storageRef); // It retreives the download URL for the file that was just uploaded to Firebase Storage
+                    console.log("Document URL: ",docUrl)
                     await updateDoc(doc(db,"chats",chatId),
                 {
                     messages: arrayUnion({
@@ -187,16 +195,17 @@ const Chat = () =>
                 toast.success("Successfull file upload")
             }
                 else{
-                    toast.error("Error uploading file: " , err)
+                    console.log("Error uploading file: ",err)
+                    toast.error("Error uploading file.Plz try again" , err)
                 }
             } 
                 catch (err) {
-                    toast.error("Error uploading image:", err);
+                    toast.error("No file selected. Please choose a file to upload");
                 }
             }
         else
             {
-                toast.error("No file selected")
+                toast.error("No file selected.Please choose a file to upload.")
             }
         }
 
