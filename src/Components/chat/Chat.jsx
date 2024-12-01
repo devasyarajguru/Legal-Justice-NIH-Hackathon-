@@ -148,10 +148,12 @@ const Chat = () =>
     // Handling image
     const handleFileUpload = async(e) =>
         {
+            console.log("File upload triggered")
             const file = e.target.files[0]
             // if the file is selected , set the avatar state to the file and the url to the file
+            console.log("Selected File:",file)
             if(file) // first file in the array
-            {
+            {   
                 const fileType = file.type; // file.type returns a string that represents the media type of the file. 
                 const userId = currentUser?.id;
                 if(!userId)
@@ -165,6 +167,7 @@ const Chat = () =>
                 try {
                     if(fileType.startsWith('image/'))
                     {
+                    console.log("Uploading image....")
                     const imgUrl = await upload(file);
 
                     // Send message with image immediately
@@ -182,9 +185,10 @@ const Chat = () =>
 
                      //Last one handles the .docx file upload 
                 {
+                    console.log("Uploading file to: ",storageRef)
                     await uploadBytes(storageRef, file); // uploadBytes is used to upload a file to Firebase Storage , it's a part of Storage SDK
                     const docUrl = await getDownloadURL(storageRef); // It retreives the download URL for the file that was just uploaded to Firebase Storage
-                    console.log("Document URL: ",docUrl)
+                    console.log("File uploaded successfully. Document URL: ",docUrl)
                     await updateDoc(doc(db,"chats",chatId),
                 {
                     messages: arrayUnion({
@@ -331,7 +335,12 @@ const Chat = () =>
                     <label htmlFor='file'>
                         <img src={img} alt='image-icon'/>
                     </label>
-                        <input type='file' id="file" style={{display:"none"}} onChange={handleFileUpload} accept="image/*,.pdf,.doc,.docx,.txt"/>
+                        <input 
+                        type='file' 
+                        id="file" 
+                        style={{display:"none"}} 
+                        onChange={handleFileUpload} 
+                        accept="image/*,.pdf,.doc,.docx,.txt"/>
                         <img src={camera} alt='camera-icon'/>
                         <img src={mic} alt='mic-icon'/>
                 </div>
