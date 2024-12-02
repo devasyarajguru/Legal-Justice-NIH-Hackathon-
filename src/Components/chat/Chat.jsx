@@ -155,6 +155,7 @@ const Chat = () =>
             if(file) // first file in the array
             {   
                 const fileType = file.type; // file.type returns a string that represents the media type of the file. 
+                console.log("File Type: ",fileType)
                 const userId = currentUser?.id;
                 if(!userId)
                 {
@@ -181,7 +182,8 @@ const Chat = () =>
                     console.log("Image uploaded successfully")
                 }
 
-                else if(fileType === 'application/pdf' || fileType === 'application/msword' || fileType === 'application/vmd.openxmlformats-officedocument.wordprocessingml.document')
+                else if(fileType === 'application/pdf' || fileType === 'application/msword' || fileType === 'application/vmd.openxmlformats-officedocument.wordprocessingml.document'
+                   || fileType === 'text/plain' )
 
                      //Last one handles the .docx file upload 
                 {
@@ -200,15 +202,17 @@ const Chat = () =>
                 toast.success("Successfull file upload")
             }
                 else{
-                    console.log("Error uploading file: ",err)
-                    toast.error("Error uploading file.Plz try again" , err)
+                    console.log("Unsupported file format" , err )
+                    toast.error("Unsupported file format" , err)
+                    return;
                 }
-            } 
+                    } 
                 catch (err) {
-                    toast.error("No file selected. Please choose a file to upload");
+                    console.error(`Could'nt Upload file: ${err.message || err}`);
+                    toast.error("Could'nt Upload file");
                 }
             }
-        else
+            else
             {
                 toast.error("No file selected.Please choose a file to upload.")
             }
