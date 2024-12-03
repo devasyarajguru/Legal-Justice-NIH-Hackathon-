@@ -152,19 +152,23 @@ const Chat = () =>
             const file = e.target.files[0]
             // if the file is selected , set the avatar state to the file and the url to the file
             console.log("Selected File:",file)
-            if(file) // first file in the array
-            {   
-                const fileType = file.type; // file.type returns a string that represents the media type of the file. 
-                console.log("File Type: ",fileType)
-                const userId = currentUser?.id;
-                if(!userId)
+
+            if(!currentUser)
                 {
                     toast.error("User is not authenticated")
                     console.error("User not authenticated!")
                     return;
                 }
+
+            if(file) // first file in the array
+            {   
+                const fileType = file.type; // file.type returns a string that represents the media type of the file. 
+                console.log("File Type: ",fileType)
+                const userId = currentUser?.id;
+                console.log("User ID: ",userId);
+               
                 const storageRef = ref(storage, `images/${userId}/${file.name}`); // reference to where the file should be stored in the storage
-                    console.log("Storage reference: ",storageRef)
+                    console.log("Storage reference: ",storageRef.fullPath)
                 try {
                     if(fileType.startsWith('image/'))
                     {
@@ -372,4 +376,4 @@ const Chat = () =>
     )
 }
 
-export default Chat;
+export default Chat;    
