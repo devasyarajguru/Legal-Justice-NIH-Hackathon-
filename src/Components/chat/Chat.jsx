@@ -145,81 +145,49 @@ const Chat = () =>
     }
 
     // Handling image
-    const handleFileUpload = async(e) =>
-        {
-            console.log("File upload triggered")
-            const file = e.target.files[0]
-            // if the file is selected , set the avatar state to the file and the url to the file
-            console.log("Selected File:",file)
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0]; // Get the first file from the input
+        console.log("Selected file:", file); // Log the selected file
 
-            if(!currentUser)
-                {
-                    toast.error("User is not authenticated")
-                    console.error("User not authenticated!")
-                    return;
-                }
-
-            if(file) // first file in the array
-            {   
-                const fileType = file.type; // file.type returns a string that represents the media type of the file. 
-                console.log("File Type: ",fileType)
-                const userId = currentUser?.id;
-                console.log("User ID: ",userId);
-               
-                const storageRef = ref(storage, `images/${userId}/${file.name}`); // reference to where the file should be stored in the storage
-                    console.log("Storage reference: ",storageRef.fullPath)
-                try {
-                    if(fileType.startsWith('image/'))
-                    {
-                    console.log("Uploading image....")
-                    const imgUrl = await upload(file);
-
-                    // Send message with image immediately
-                    await updateDoc(doc(db, "chats", chatId), {
-                        messages: arrayUnion({
-                            senderId: currentUser.id,
-                            img: imgUrl,
-                            createdAt: new Date()
-                        })
-                    });
-                    console.log("Image uploaded successfully")
-                }
-
-                else if(fileType === 'application/pdf' || fileType === 'application/msword' || fileType === 'application/vmd.openxmlformats-officedocument.wordprocessingml.document'
-                   || fileType === 'text/plain' )
-
-                     //Last one handles the .docx file upload 
-                {
-                    console.log("Uploading file to: ",storageRef)
-                    await uploadBytes(storageRef, file); // uploadBytes is used to upload a file to Firebase Storage , it's a part of Storage SDK
-                    const docUrl = await getDownloadURL(storageRef); // It retreives the download URL for the file that was just uploaded to Firebase Storage
-                    console.log("File uploaded successfully. Document URL: ",docUrl)
-                    await updateDoc(doc(db,"chats",chatId),
-                {
-                    messages: arrayUnion({
-                        senderId: currentUser.id,
-                        doc: docUrl, // Store the document URL
-                        createdAt: new Date()
-                })
-                })
-                toast.success("Successfull file upload")
-            }
-                else{
-                    console.log("Unsupported file format" , err )
-                    toast.error("Unsupported file format" , err)
-                    return;
-                }
-                    } 
-                catch (err) {
-                    console.error(`Could'nt Upload file: ${err.message || err}`);
-                    toast.error("Could'nt Upload file");
-                }
-            }
-            else
-            {
-                toast.error("No file selected.Please choose a file to upload.")
-            }
+        if (!file) {
+            toast.error("No file selected. Please choose a file to upload.");
+            return; // Exit if no file is selected
         }
+
+        // Check if the file is an image
+        if (!file.type.startsWith('image/')) {
+            toast.error("Please upload an image file.");
+            return; // Exit if the file is not an image
+        }
+
+        const userId = currentUser?.id; // Ensure currentUser is defined
+        if (!userId) {
+            toast.error("User is not authenticated");
+            return; // Exit if userId is not available
+        }
+
+        const storageRef = ref(storage, `images/${userId}/${file.name}`); // Create a reference
+        console.log("Storage reference:", storageRef.fullPath); // Log the storage reference
+
+        try {
+            console.log("Uploading image..."); // Log the upload process
+            const imgUrl = await upload(file); // Use your upload function to upload the image
+
+            // Send message with image immediately
+            await updateDoc(doc(db, "chats", chatId), {
+                messages: arrayUnion({
+                    senderId: currentUser.id,
+                    img: imgUrl, // Store the image URL
+                    createdAt: new Date()
+                })
+            });
+            toast.success("Image uploaded successfully!");
+        } catch (err) {
+            console.error("Error uploading image:", err); // Log the error details
+            toast.error(`Couldn't upload image: ${err.message || err}`); // Show a more detailed error message
+        }
+    };
+
 
 
     // Handling key press
@@ -347,7 +315,7 @@ const Chat = () =>
                         id="file" 
                         style={{display:"none"}} 
                         onChange={handleFileUpload} 
-                        accept="image/*,.pdf,.doc,.docx,.txt"/>
+                        accept="image/*"/>
                         <img src={camera} alt='camera-icon'/>
                         <img src={mic} alt='mic-icon'/>
                 </div>
