@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import Notification from '../Notification'
 
 // Testing commits
+// Testing commits
 const Chat = () =>
 { 
     // Getting the current user from userStore
@@ -35,12 +36,18 @@ const Chat = () =>
     // Input text state
     const [text,setText] = useState("")
 
-
     const endRef = useRef(null) // endRef for scrolling to the end of the chat
 
     const [dialogOpen, setDialogOpen] = useState(false); // State to manage dialog visibility
     const [messageToDelete, setMessageToDelete] = useState(null); // State to hold the message to delete
     const [dialogMessage, setDialogMessage] = useState(''); // New state for dialog message
+
+    const [img,setImg] = useState(
+        {
+            file:null,
+            url:"",
+        }
+    )
 
     useEffect(() =>
     {
@@ -73,8 +80,17 @@ const Chat = () =>
             return;
         }
 
+        if(text === "") return;
+
+        let imgUrl = null;
+
         // updating the chat in firestore
-        try{         
+        try{     
+            if (img.file)
+            {
+                imgUrl = await upload(img.file)
+            }
+            
             await updateDoc(doc(db,"chats" ,chatId) ,
         {
             // adding the message to the chat
@@ -82,7 +98,7 @@ const Chat = () =>
                 senderId: currentUser.id, // sender id
                 text, // message text
                 createdAt:new Date(), // created at time
-                // ...(imgUrl && {img: imgUrl})
+                ...(imgUrl && {img: imgUrl})
             })
         });
 
@@ -135,6 +151,11 @@ const Chat = () =>
         {
             console.error("Error sending messages:", err);
         }
+
+        setImg({
+            file:null,
+            url:""
+        })
     }
 
     // Handling emoji 
@@ -144,49 +165,64 @@ const Chat = () =>
         setOpen(false) // closing the emoji picker
     }
 
+    const handleImg = (e) =>
+        {
+            // if the file is selected , set the avatar state to the file and the url to the file
+            if(e.target.files[0]) // first file in the array
+            {
+                setImg(
+                    {
+                        file: e.target.files[0], // file is the selected file
+                        url:URL.createObjectURL(e.target.files[0]) // URL.createObjectURL is used to create a URL for the selected file , to display the image
+                    }
+                )
+
+            }
+        }
+
     // Handling image
-    const handleFileUpload = async (e) => {
-        const file = e.target.files[0]; // Get the first file from the input
-        console.log("Selected file:", file); // Log the selected file
+    // const handleFileUpload = async (e) => {
+    //     const file = e.target.files[0]; // Get the first file from the input
+    //     console.log("Selected file:", file); // Log the selected file
 
-        if (!file) {
-            toast.error("No file selected. Please choose a file to upload.");
-            return; // Exit if no file is selected
-        }
+    //     if (!file) {
+    //         toast.error("No file selected. Please choose a file to upload.");
+    //         return; // Exit if no file is selected
+    //     }
 
-        // Check if the file is an image
-        if (!file.type.startsWith('image/')) {
-            toast.error("Please upload an image file.");
-            return; // Exit if the file is not an image
-        }
+    //     // Check if the file is an image
+    //     if (!file.type.startsWith('image/')) {
+    //         toast.error("Please upload an image file.");
+    //         return; // Exit if the file is not an image
+    //     }
 
-        const userId = currentUser?.id; // Ensure currentUser is defined
-        if (!userId) {
-            toast.error("User is not authenticated");
-            return; // Exit if userId is not available
-        }
+    //     const userId = currentUser?.id; // Ensure currentUser is defined
+    //     if (!userId) {
+    //         toast.error("User is not authenticated");
+    //         return; // Exit if userId is not available
+    //     }
 
-        const storageRef = ref(storage, `images/${userId}/${file.name}`); // Create a reference
-        console.log("Storage reference:", storageRef.fullPath); // Log the storage reference
+    //     const storageRef = ref(storage, `images/${userId}/${file.name}`); // Create a reference
+    //     console.log("Storage reference:", storageRef.fullPath); // Log the storage reference
 
-        try {
-            console.log("Uploading image..."); // Log the upload process
-            const imgUrl = await upload(file); // Use your upload function to upload the image
+    //     try {
+    //         console.log("Uploading image..."); // Log the upload process
+    //         const imgUrl = await upload(file); // Use your upload function to upload the image
 
-            // Send message with image immediately
-            await updateDoc(doc(db, "chats", chatId), {
-                messages: arrayUnion({
-                    senderId: currentUser.id,
-                    img: imgUrl, // Store the image URL
-                    createdAt: new Date()
-                })
-            });
-            toast.success("Image uploaded successfully!");
-        } catch (err) {
-            console.error("Error uploading image:", err); // Log the error details
-            toast.error(`Couldn't upload image: ${err.message || err}`); // Show a more detailed error message
-        }
-    };
+    //         // Send message with image immediately
+    //         await updateDoc(doc(db, "chats", chatId), {
+    //             messages: arrayUnion({
+    //                 senderId: currentUser.id,
+    //                 img: imgUrl, // Store the image URL
+    //                 createdAt: new Date()
+    //             })
+    //         });
+    //         toast.success("Image uploaded successfully!");
+    //     } catch (err) {
+    //         console.error("Error uploading image:", err); // Log the error details
+    //         toast.error(`Couldn't upload image: ${err.message || err}`); // Show a more detailed error message
+    //     }
+    // };
 
 
 
@@ -314,8 +350,8 @@ const Chat = () =>
                         type='file' 
                         id="file" 
                         style={{display:"none"}} 
-                        onChange={handleFileUpload} 
-                        accept="image/*"/>
+                        onChange={handleImg} 
+                        />
                         <img src={camera} alt='camera-icon'/>
                         <img src={mic} alt='mic-icon'/>
                 </div>
