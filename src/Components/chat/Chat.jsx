@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import Notification from '../Notification'
 
 // Testing commits
+// Testing commit
 const Chat = () =>
 { 
     // Getting the current user from userStore
