@@ -1,19 +1,17 @@
 import './chat.css'
 import avatar from './assets/avatar.png';
 import emoji from './assets/emoji.png';
-import img from './assets/img.png';
+import imageIcon from './assets/img.png';
 import camera from './assets/camera.png';
 import mic from './assets/mic.png';
 import EmojiPicker from 'emoji-picker-react';
 import {useRef, useState , useEffect} from 'react'
 import { doc, onSnapshot, updateDoc ,arrayUnion , getDoc, arrayRemove } from 'firebase/firestore';
-import { db, storage } from '../lib/firebase';
+import { db } from '../lib/firebase';
 import { chatStore } from '../lib/chatStore';
 import { useUserStore } from '../lib/userStore';
 import upload from '../lib/upload';
 import AlertDialog from './AlertDialog'; // Import the AlertDialog component
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import DocumentIcon from '../../assets/document.png'; // Correct path to import the document icon
 import { toast } from 'react-toastify';
 import Notification from '../Notification'
 
@@ -63,6 +61,7 @@ const Chat = () =>
         (res) =>
         {
             setChat(res.data()); // setting the chat state with the chat data from firestore
+            console.log("Chat Data:" , res.data())
         }
     );
 
@@ -75,8 +74,11 @@ const Chat = () =>
     // Handling Send button
     const handleSend = async () =>
     {
+        console.log("Handle Send function triggered!"); 
+
         // if the chatId, user or currentUser is not found, return
         if (!chatId || !user || !currentUser?.id || text.trim() === "") {
+            console.log("Missing chatId, user, or currentUser.");
             return;
         }
 
@@ -86,13 +88,22 @@ const Chat = () =>
 
         // updating the chat in firestore
         try{     
-            if (img.file)
+            if (img?.file)
             {
+                console.log("Image object:", img); 
+                console.log("Image file detected, uploading..." );
+
                 imgUrl = await upload(img.file)
+                console.log("Uploaded Image URL:",imgUrl)
+            }
+
+            else {
+                console.log("No image file detected.");
             }
             
+             // Update chat in Firestore
             await updateDoc(doc(db,"chats" ,chatId) ,
-        {
+            {
             // adding the message to the chat
             messages: arrayUnion({
                 senderId: currentUser.id, // sender id
@@ -101,6 +112,8 @@ const Chat = () =>
                 ...(imgUrl && {img: imgUrl})
             })
         });
+
+        console.log("Message successfully sent!");
 
         setText("") // clear input after sending the message
         
@@ -139,11 +152,20 @@ const Chat = () =>
                     updatedChats[chatIndex] = updatedChat // Update the specific chat
                     
                     // Updating the userchats in firestore
-            await updateDoc(userChatRef ,   
+                     await updateDoc(userChatRef ,   
                 {
                     chats: updatedChats, // Updating the chats array with the updated chat
-                })
+                });
+
+                console.log(
+                    `User chat updated for user ID ${id} with chat ID ${chatId}`
+                );
+
                 }
+            }
+
+            else {
+                console.log(`User chat for ID ${id} not found.`);
             }
         }
     }
@@ -155,7 +177,9 @@ const Chat = () =>
         setImg({
             file:null,
             url:""
-        })
+        });
+
+        console.log("Image state reset.");
     }
 
     // Handling emoji 
@@ -167,17 +191,23 @@ const Chat = () =>
 
     const handleImg = (e) =>
         {
+            console.log("Handle Image function triggered!")
             // if the file is selected , set the avatar state to the file and the url to the file
             if(e.target.files[0]) // first file in the array
             {
+                console.log("Selected file:", e.target.files[0])
                 setImg(
                     {
                         file: e.target.files[0], // file is the selected file
                         url:URL.createObjectURL(e.target.files[0]) // URL.createObjectURL is used to create a URL for the selected file , to display the image
                     }
                 )
-
             }
+
+            else {
+                console.log("No file selected."); 
+            }
+
         }
 
     // Handling image
@@ -287,26 +317,21 @@ const Chat = () =>
             {/* Center class starts */}
             <div className="center">
                 {chat?.messages?.map((message) => {
-                    console.log("Message:",message); // Log the message object to inspect its structure
+                    // console.log("Rendering Message:" , message)
                     return (
-                        <div className={`chat-message ${message.senderId === currentUser.id ? "own" : "chat-message"}`} key={message.createdAt}>
+                        // Chat message starts
+                        <div className={`chat-message ${message.senderId === currentUser.id ? "own" : ""}`} key={message.createdAt}>
+
+                            {/* Chat text starts */}
                             <div className="chat-texts">
                                 {message.img && (
                                     <div className="image-container">
                                         <img src={message.img} className='sender-image' alt='User uploaded image' />
                                         <span className='three-dots' onClick={() => handleClickOpen(message)}>...</span>
                                     </div>
+                                    
                                 )}
-                                {message.doc && (
-                                    <div className="document-container">
-                                        <a href={message.doc} target='_blank' rel='noopener noreferrer' className='document-link'>
-                                            <img src={DocumentIcon} alt='Document Icon' className='document-icon' />
-                                            <span className='doc-msg'>{message.doc.split('/').pop()}</span> 
-                                            {/* Display only the file name */}
-                                        </a>
-                                        <span className='three-dots' onClick={() => handleClickOpen(message)}>...</span>
-                                    </div>
-                                )}
+                                
                                 {message.text && (
                                     <div className="text-container">
                                         {message.senderId === currentUser.id ? (
@@ -322,10 +347,17 @@ const Chat = () =>
                                         )}
                                     </div>
                                 )}
+
+                                
                             </div>
+                            {/* Chat text ends */}
+
                         </div>
+                        // Chat message ends
+
                     );
                 })}
+                
                 {/* endRef for scrolling to the end of the chat */}
                 <div ref={endRef}></div>
 
@@ -344,7 +376,7 @@ const Chat = () =>
                 {/* icons  */}
                 <div className="bottom-icons">
                     <label htmlFor='file'>
-                        <img src={img} alt='image-icon'/>
+                        <img src={imageIcon} alt='image-icon'/>
                     </label>
                         <input 
                         type='file' 
