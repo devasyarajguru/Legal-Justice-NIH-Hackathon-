@@ -5,8 +5,8 @@ import imageIcon from './assets/img.png';
 import camera from './assets/camera.png';
 import mic from './assets/mic.png';
 import EmojiPicker from 'emoji-picker-react';
-import {useRef, useState , useEffect} from 'react'
-import { doc, onSnapshot, updateDoc ,arrayUnion , getDoc, arrayRemove } from 'firebase/firestore';
+import {useRef, useState , useEffect, useCallback} from 'react'
+import { doc, onSnapshot, updateDoc ,arrayUnion , getDoc, arrayRemove, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { chatStore } from '../lib/chatStore';
 import { useUserStore } from '../lib/userStore';
@@ -37,8 +37,16 @@ const Chat = () =>
     const endRef = useRef(null) // endRef for scrolling to the end of the chat
 
     const [dialogOpen, setDialogOpen] = useState(false); // State to manage dialog visibility
+
     const [messageToDelete, setMessageToDelete] = useState(null); // State to hold the message to delete
+
     const [dialogMessage, setDialogMessage] = useState(''); // New state for dialog message
+
+    // Typing indication
+    const [isTyping, setIsTyping] = useState(false);
+    const [otherUserTyping, setOtherUserTyping] = useState(false);
+    const typingTimeout = useRef(null); // Store the ID of timeout
+
 
     const [img,setImg] = useState(
         {
@@ -71,6 +79,36 @@ const Chat = () =>
     };
     },[chatId])
 
+
+    // Listen for typing status
+    useEffect(() => {
+        if (!chatId) return;
+
+        const chatRef = doc(db, "chats", chatId);
+        const unsubscribe = onSnapshot(chatRef, (doc) => {
+            const typingStatus = doc.data()?.typingStatus || {}; // bring the typingStatus data to check for status
+            const otherUserId = user.id; // Assigning other user's id
+            
+            // Check if the other user is typing
+            setOtherUserTyping(
+                typingStatus[otherUserId] === true && 
+                typingStatus[otherUserId] !== currentUser.id
+            );
+        });
+
+        return () => unsubscribe();
+    }, [chatId, user.id, currentUser.id]);
+
+     // Cleanup on component unmount
+     useEffect(() => {
+        return () => {
+            if (typingTimeout.current) {
+                clearTimeout(typingTimeout.current);
+            }
+            updateTypingStatus(false);
+        };
+    }, []);
+
     // Handling Send button
     const handleSend = async () =>
     {
@@ -101,6 +139,8 @@ const Chat = () =>
                 console.log("No image file detected.");
             }
             
+            const timestamp = serverTimestamp();
+
              // Update chat in Firestore
             await updateDoc(doc(db,"chats" ,chatId) ,
             {
@@ -110,12 +150,15 @@ const Chat = () =>
                 text, // message text
                 createdAt:new Date(), // created at time
                 ...(imgUrl && {img: imgUrl})
-            })
+            }),
+
+            [`typingStatus.${currentUser.id}`]: false
         });
 
         console.log("Message successfully sent!");
 
         setText("") // clear input after sending the message
+        setIsTyping(false); // Reset local typing state
         
 
         // Update last message for both users
@@ -141,7 +184,7 @@ const Chat = () =>
                         ...userChatsData.chats[chatIndex], // copying the existing chat
                         lastMessage: text, // updating the last message
                         isSeen: id === currentUser.id ? true: false, // updating the isSeen to true because we have sent the message
-                        updatedAt: Date.now(), // updating the updatedAt time
+                        updatedAt: timestamp, // updating the updatedAt time
                         chatId:chatId, // updating the chatId
                         receiverId: id === currentUser.id ? user.id : currentUser.id // updating the receiverId
                         
@@ -210,51 +253,6 @@ const Chat = () =>
 
         }
 
-    // Handling image
-    // const handleFileUpload = async (e) => {
-    //     const file = e.target.files[0]; // Get the first file from the input
-    //     console.log("Selected file:", file); // Log the selected file
-
-    //     if (!file) {
-    //         toast.error("No file selected. Please choose a file to upload.");
-    //         return; // Exit if no file is selected
-    //     }
-
-    //     // Check if the file is an image
-    //     if (!file.type.startsWith('image/')) {
-    //         toast.error("Please upload an image file.");
-    //         return; // Exit if the file is not an image
-    //     }
-
-    //     const userId = currentUser?.id; // Ensure currentUser is defined
-    //     if (!userId) {
-    //         toast.error("User is not authenticated");
-    //         return; // Exit if userId is not available
-    //     }
-
-    //     const storageRef = ref(storage, `images/${userId}/${file.name}`); // Create a reference
-    //     console.log("Storage reference:", storageRef.fullPath); // Log the storage reference
-
-    //     try {
-    //         console.log("Uploading image..."); // Log the upload process
-    //         const imgUrl = await upload(file); // Use your upload function to upload the image
-
-    //         // Send message with image immediately
-    //         await updateDoc(doc(db, "chats", chatId), {
-    //             messages: arrayUnion({
-    //                 senderId: currentUser.id,
-    //                 img: imgUrl, // Store the image URL
-    //                 createdAt: new Date()
-    //             })
-    //         });
-    //         toast.success("Image uploaded successfully!");
-    //     } catch (err) {
-    //         console.error("Error uploading image:", err); // Log the error details
-    //         toast.error(`Couldn't upload image: ${err.message || err}`); // Show a more detailed error message
-    //     }
-    // };
-
-
 
     // Handling key press
     const handleKeyPress = e =>
@@ -294,6 +292,60 @@ const Chat = () =>
         }
     };
 
+    // When user starts typing
+    const updateTypingStatus = async(isTyping) =>
+    {
+        if(!currentUser?.id || !chatId) return; // if no current chatId or currentUser return nothing
+
+        try{
+            // update the typing status in firestore database
+            await updateDoc(doc(db, "chats" , chatId), {
+                [`typingStatus.${currentUser.id}`]: isTyping
+            });
+        }
+
+        catch (error)
+        {
+            console.error("Error updating typing status:", error)
+        }
+    }
+
+    // Handle typing status
+    const handleTyping = (e) => {
+        setText(e.target.value); // Update the text input
+
+        // This indicates at least user has typed one character
+        const typing = e.target.value.length > 0;
+
+        // If user is typing or has stopped typing
+        if (typing !== isTyping) {
+            setIsTyping(typing); // updates the local state
+            updateTypingStatus(typing); // This function updates typing status in Firestore
+        }
+
+        // If user is typing, schedule the stop typing timeout
+        if (typing) {
+            if (typingTimeout.current) {
+                clearTimeout(typingTimeout.current); // This prevents multiple timeouts from running simultaneously
+            }
+            typingTimeout.current = setTimeout(() => {
+                updateTypingStatus(false); // user is no longer typing
+                setIsTyping(false); // stop the typing animation/UI
+            }, 1500);
+        }
+    };
+
+    // Add this function inside your Chat component or in a separate utils file
+    const formatMessageTime = (timestamp) => {
+        if (!timestamp) return '';
+        
+        const date = timestamp.toDate(); // Convert Firestore timestamp to Date object
+        return date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        }).toLowerCase(); // Convert "PM" to "pm" to match WhatsApp style
+    };
 
     return (
         <>
@@ -328,6 +380,7 @@ const Chat = () =>
                                     <div className="image-container">
                                         <img src={message.img} className='sender-image' alt='User uploaded image' />
                                         <span className='three-dots' onClick={() => handleClickOpen(message)}>...</span>
+                                        <span className="message-time">{formatMessageTime(message.createdAt)}</span>
                                     </div>
                                     
                                 )}
@@ -337,11 +390,17 @@ const Chat = () =>
                                         {message.senderId === currentUser.id ? (
                                             <>
                                                 <span className='three-dots own' onClick={() => handleClickOpen(message)}>...</span>
-                                                <p className="own-text">{message.text}</p>
+                                                <div className="text-time-container own">
+                                                    <p className="own-text">{message.text}</p>
+                                                    <span className="message-time">{formatMessageTime(message.createdAt)}</span>
+                                                </div>
                                             </>
                                         ) : (
                                             <>
-                                                <p className="sender-text">{message.text}</p>
+                                                <div className="text-time-container">
+                                                    <p className="sender-text">{message.text}</p>
+                                                    <span className="message-time">{formatMessageTime(message.createdAt)}</span>
+                                                </div>
                                                 <span className='three-dots sender' onClick={() => handleClickOpen(message)}>...</span>
                                             </>
                                         )}
@@ -358,6 +417,17 @@ const Chat = () =>
                     );
                 })}
                 
+                {/* Add typing indicator after the last message */}
+                {otherUserTyping && (
+                    <div className="chat-message">
+                        <div className="typing-indicator">
+                            <div className="typing-dot"></div>
+                            <div className="typing-dot"></div>
+                            <div className="typing-dot"></div>
+                        </div>
+                    </div>
+                )}
+
                 {/* endRef for scrolling to the end of the chat */}
                 <div ref={endRef}></div>
 
@@ -369,7 +439,6 @@ const Chat = () =>
                     message={dialogMessage}
                 />
             </div>
-            {/* Center class ends */}   
 
             {/* bottom class starts */}
             <div className="bottom">
@@ -389,7 +458,16 @@ const Chat = () =>
                 </div>
                 {/* icons  */}
 
-                    <input type='text' placeholder='Type a message...' onChange={e=>setText(e.target.value)} onKeyDown={handleKeyPress} value={text}/> 
+                    <input 
+                        type='text' 
+                        placeholder='Type a message...' 
+                        onChange={(e)=>
+                        {
+                            setText(e.target.value) // Update the text state
+                            handleTyping(e); // Check and update typing status
+                        } }
+                        onKeyDown={handleKeyPress} 
+                        value={text}/> 
 
                     {/* emoji class starts */}
                     <div className="emoji">
