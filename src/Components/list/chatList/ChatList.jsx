@@ -27,7 +27,6 @@ const ChatList = () =>
         // Getting the chat list of the current user
         useEffect(() =>
         {
-
             const createEmptyChats = async () =>
             {   
                 try {
@@ -91,10 +90,13 @@ const ChatList = () =>
 
                             const userData = userDocSnap.data()
 
+                            // Ensure updatedAt is properly set
+                            const updatedAt = item.updatedAt || Date.now();
+
                             return {
                                 ...item , 
                                 user:userData,
-                                updatedAt: item.updatedAt || Date.now()
+                                updatedAt: updatedAt
                             };
                         }
                         catch(error)
@@ -169,7 +171,33 @@ const ChatList = () =>
         // checks if the name is there in object and in the searched bar value
     )
 
-   
+    // Add the time formatting function (same as in Chat.jsx)
+    const formatMessageTime = (timestamp) => {
+        if (!timestamp) return '';
+        
+        try {
+            // If it's a Firestore timestamp
+            if (timestamp.toDate) {
+                return timestamp.toDate().toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                }).toLowerCase();
+            }
+            
+            // If it's a regular timestamp (number)
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            }).toLowerCase();
+        } catch (error) {
+            console.error("Error formatting time:", error);
+            return '';
+        }
+    };
+
         return (
             // chatList main container starts
             <div className="chatList">
@@ -191,13 +219,22 @@ const ChatList = () =>
 
                 {/* Displaying names of users also with filer values if search through searchBar */}
                 {filterChats.map(item => (
-                    <div className={`item ${!item.isSeen ? "unread" : ""} ${selectedChat === item.chatId ? "selected" : ""}`} key={item.chatId} onClick={() =>handleSelect(item)}>
-                        <img src={item.user?.avatar||avatar} alt='user' />
-                        <div className="texts">
-                            <span>{item.user?.username || "Unknown user"}</span> 
-                            <p className='texts-p'>{item.lastMessage || "No messages yet"}</p>
+                    <div 
+                    className={`item ${!item.isSeen ? "unread" : ""} ${selectedChat === item.chatId ? "selected" : ""}`} 
+                    key={item.chatId} 
+                    onClick={() => handleSelect(item)}
+                >
+                    <img src={item.user?.avatar || avatar} alt='user' />
+                    <div className="texts">
+                        <div className="name-time">
+                            <span className="name">{item.user?.username || "Unknown user"}</span>
+                            <span className="time">
+                                {item.updatedAt ? formatMessageTime(item.updatedAt) : ""}
+                            </span>
                         </div>
+                        <p className='texts-p'>{item.lastMessage || "No messages yet"}</p>
                     </div>
+                </div>
                 ))}
 
                 {/* Chat item ends*/}
