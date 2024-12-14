@@ -5,7 +5,7 @@ import minusImg from './assets/minus.png';
 import avatar from '../userinfo/assets/avatar.png';
 import { useEffect, useState } from 'react';
 import { useUserStore } from '../../lib/userStore';
-import { doc, onSnapshot , getDoc, setDoc} from 'firebase/firestore';
+import { doc, onSnapshot , getDoc, setDoc , Timestamp, updateDoc} from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import NewUser from './newUser/NewUser'
 import { chatStore } from '../../lib/chatStore';
@@ -91,12 +91,15 @@ const ChatList = () =>
                             const userData = userDocSnap.data()
 
                             // Ensure updatedAt is properly set
-                            const updatedAt = item.updatedAt || Date.now();
+                            const updatedAt = item.updatedAt instanceof Timestamp
+                            ? item.updatedAt.toMillis()
+                            : new Date(item.updatedAt).getTime();
 
                             return {
                                 ...item , 
                                 user:userData,
-                                updatedAt: updatedAt
+                                updatedAt: updatedAt || Date.now(),
+                                unreadCount: item.unreadCount || 0
                             };
                         }
                         catch(error)
@@ -163,7 +166,30 @@ const ChatList = () =>
                 id:item.receiverId
             }
             changeChat(item.chatId,userWithId)
-        }
+
+            // Reset unread count when chat is selected
+            const userChatRef = doc(db, "userchats", currentUser.id);
+            const userChatsSnapshot = await getDoc(userChatRef);
+
+            if (userChatsSnapshot.exists()) {
+                const userChatsData = userChatsSnapshot.data();
+                const chatIndex = userChatsData.chats.findIndex(c => c.chatId === item.chatId);
+
+                if (chatIndex !== -1) {
+                    const updatedChat = {
+                        ...userChatsData.chats[chatIndex],
+                        unreadCount: 0 // Reset unread count for current user
+                    };
+
+                    const updatedChats = [...userChatsData.chats];
+                    updatedChats[chatIndex] = updatedChat;
+
+                    await updateDoc(userChatRef, {
+                        chats: updatedChats,
+                    });
+                }
+            }
+        } 
 
     // Function to Filter out names
     const filterChats = chats.filter(item =>
@@ -171,32 +197,23 @@ const ChatList = () =>
         // checks if the name is there in object and in the searched bar value
     )
 
-    // Add the time formatting function (same as in Chat.jsx)
     const formatMessageTime = (timestamp) => {
-        if (!timestamp) return '';
-        
+        if (!timestamp) return "";
+      
         try {
-            // If it's a Firestore timestamp
-            if (timestamp.toDate) {
-                return timestamp.toDate().toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true
-                }).toLowerCase();
-            }
-            
-            // If it's a regular timestamp (number)
-            const date = new Date(timestamp);
-            return date.toLocaleTimeString('en-US', {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
-            }).toLowerCase();
+          const date = new Date(
+            typeof timestamp === "number" ? timestamp : timestamp.toMillis()
+          );
+          return date.toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: false,
+          });
         } catch (error) {
-            console.error("Error formatting time:", error);
-            return '';
+          console.error("Error formatting time:", error);
+          return "";
         }
-    };
+      };
 
         return (
             // chatList main container starts
@@ -233,6 +250,13 @@ const ChatList = () =>
                             </span>
                         </div>
                         <p className='texts-p'>{item.lastMessage || "No messages yet"}</p>
+
+                        {item.unreadCount > 0 &&
+                        (
+                            <div className="unread-count">
+                                {item.unreadCount}
+                            </div>
+                        )}
                     </div>
                 </div>
                 ))}
