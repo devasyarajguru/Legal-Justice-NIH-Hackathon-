@@ -6,7 +6,7 @@ import camera from './assets/camera.png';
 import mic from './assets/mic.png';
 import EmojiPicker from 'emoji-picker-react';
 import {useRef, useState , useEffect, useCallback} from 'react'
-import { doc, onSnapshot, updateDoc ,arrayUnion , getDoc, arrayRemove, serverTimestamp } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc ,arrayUnion , getDoc, arrayRemove, Timestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { chatStore } from '../lib/chatStore';
 import { useUserStore } from '../lib/userStore';
@@ -139,7 +139,6 @@ const Chat = () =>
                 console.log("No image file detected.");
             }
             
-            const timestamp = serverTimestamp();
 
              // Update chat in Firestore
             await updateDoc(doc(db,"chats" ,chatId) ,
@@ -155,7 +154,6 @@ const Chat = () =>
             [`typingStatus.${currentUser.id}`]: false
         });
 
-        console.log("Message successfully sent!");
 
         setText("") // clear input after sending the message
         setIsTyping(false); // Reset local typing state
@@ -184,7 +182,8 @@ const Chat = () =>
                         ...userChatsData.chats[chatIndex], // copying the existing chat
                         lastMessage: text, // updating the last message
                         isSeen: id === currentUser.id ? true: false, // updating the isSeen to true because we have sent the message
-                        updatedAt: timestamp, // updating the updatedAt time
+                        updatedAt: Timestamp.now(), // updating the updatedAt time
+                        unreadCount: (userChatsData.chats[chatIndex].unreadCount || 0) + 1,
                         chatId:chatId, // updating the chatId
                         receiverId: id === currentUser.id ? user.id : currentUser.id // updating the receiverId
                         
@@ -205,6 +204,7 @@ const Chat = () =>
                 );
 
                 }
+
             }
 
             else {
@@ -343,7 +343,7 @@ const Chat = () =>
         return date.toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
-            hour12: true
+            hour12: false
         }).toLowerCase(); // Convert "PM" to "pm" to match WhatsApp style
     };
 
