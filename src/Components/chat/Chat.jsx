@@ -57,7 +57,7 @@ const Chat = () =>
 
     useEffect(() =>
     {
-        endRef.current.scrollIntoView({behaviour:"smooth"}) // scrolling to the end of the chat
+        endRef.current.scrollIntoView({behavior:"smooth"}) // scrolling to the end of the chat
     },[chat?.messages])
 
     // Getting the chat from firestore database
@@ -109,6 +109,46 @@ const Chat = () =>
         };
     }, []);
 
+    // Handle marking messages as seen when the chat is selected
+    useEffect(() => {
+        if (!chatId || !currentUser?.id) return;
+
+        // Fetching chat from Firestore when the user selects the chat
+        const chatRef = doc(db, "chats", chatId);
+        const unsubscribe = onSnapshot(chatRef, async (doc) => {
+            const chatData = doc.data();
+            const unreadMessages = chatData?.messages.filter(message => !message.isSeen);
+            
+            if (unreadMessages.length > 0) {
+                // When the chat is selected, mark unread messages as seen
+                const userChatRef = doc(db, "userchats", currentUser.id);
+                const userChatsSnapshot = await getDoc(userChatRef);
+                
+                if (userChatsSnapshot.exists()) {
+                    const userChatsData = userChatsSnapshot.data();
+                    const chatIndex = userChatsData.chats.findIndex(c => c.chatId === chatId);
+                    
+                    if (chatIndex !== -1) {
+                        const updatedChat = {
+                            ...userChatsData.chats[chatIndex],
+                            unreadCount: 0, // Mark as read
+                            isSeen: true,   // Update the status of the chat as seen
+                        };
+
+                        const updatedChats = [...userChatsData.chats];
+                        updatedChats[chatIndex] = updatedChat;
+
+                        await updateDoc(userChatRef, {
+                            chats: updatedChats,
+                        });
+                    }
+                }
+            }
+        });
+
+        return () => unsubscribe();
+    }, [chatId, currentUser.id]);
+
     // Handling Send button
     const handleSend = async () =>
     {
@@ -148,11 +188,35 @@ const Chat = () =>
                 senderId: currentUser.id, // sender id
                 text, // message text
                 createdAt:new Date(), // created at time
-                ...(imgUrl && {img: imgUrl})
             }),
 
             [`typingStatus.${currentUser.id}`]: false
         });
+
+        // Update unread count for the recipient
+        const recipientChatRef = doc(db, "userchats", user.id);
+        const recipientChatsSnapshot = await getDoc(recipientChatRef);
+
+        if (recipientChatsSnapshot.exists()) {
+            const recipientChats = recipientChatsSnapshot.data().chats;
+            const chatIndex = recipientChats.findIndex(c => c.chatId === chatId);
+
+            if (chatIndex !== -1) {
+                const updatedChat = {
+                    ...recipientChats[chatIndex],
+                    lastMessage: text,
+                    updatedAt: currentTime.getTime(),
+                    unreadCount: (recipientChats[chatIndex].unreadCount || 0) + 1 // Increment unread count
+                };
+
+                const updatedChats = [...recipientChats];
+                updatedChats[chatIndex] = updatedChat;
+
+                await updateDoc(recipientChatRef, {
+                    chats: updatedChats,
+                });
+            }
+        }
 
 
         setText("") // clear input after sending the message
@@ -183,7 +247,7 @@ const Chat = () =>
                         lastMessage: text, // updating the last message
                         isSeen: id === currentUser.id ? true: false, // updating the isSeen to true because we have sent the message
                         updatedAt: Timestamp.now(), // updating the updatedAt time
-                        unreadCount: (userChatsData.chats[chatIndex].unreadCount || 0) + 1,
+                        unreadCount: 0 ,
                         chatId:chatId, // updating the chatId
                         receiverId: id === currentUser.id ? user.id : currentUser.id // updating the receiverId
                         
