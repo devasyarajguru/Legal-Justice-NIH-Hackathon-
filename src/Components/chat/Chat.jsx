@@ -48,16 +48,9 @@ const Chat = () =>
     const typingTimeout = useRef(null); // Store the ID of timeout
 
 
-    const [img,setImg] = useState(
-        {
-            file:null,
-            url:"",
-        }
-    )
-
     useEffect(() =>
     {
-        endRef.current.scrollIntoView({behavior:"smooth"}) // scrolling to the end of the chat
+        endRef.current.scrollIntoView({behaviour:"smooth"}) // scrolling to the end of the chat
     },[chat?.messages])
 
     // Getting the chat from firestore database
@@ -109,46 +102,6 @@ const Chat = () =>
         };
     }, []);
 
-    // Handle marking messages as seen when the chat is selected
-    useEffect(() => {
-        if (!chatId || !currentUser?.id) return;
-
-        // Fetching chat from Firestore when the user selects the chat
-        const chatRef = doc(db, "chats", chatId);
-        const unsubscribe = onSnapshot(chatRef, async (doc) => {
-            const chatData = doc.data();
-            const unreadMessages = chatData?.messages.filter(message => !message.isSeen);
-            
-            if (unreadMessages.length > 0) {
-                // When the chat is selected, mark unread messages as seen
-                const userChatRef = doc(db, "userchats", currentUser.id);
-                const userChatsSnapshot = await getDoc(userChatRef);
-                
-                if (userChatsSnapshot.exists()) {
-                    const userChatsData = userChatsSnapshot.data();
-                    const chatIndex = userChatsData.chats.findIndex(c => c.chatId === chatId);
-                    
-                    if (chatIndex !== -1) {
-                        const updatedChat = {
-                            ...userChatsData.chats[chatIndex],
-                            unreadCount: 0, // Mark as read
-                            isSeen: true,   // Update the status of the chat as seen
-                        };
-
-                        const updatedChats = [...userChatsData.chats];
-                        updatedChats[chatIndex] = updatedChat;
-
-                        await updateDoc(userChatRef, {
-                            chats: updatedChats,
-                        });
-                    }
-                }
-            }
-        });
-
-        return () => unsubscribe();
-    }, [chatId, currentUser.id]);
-
     // Handling Send button
     const handleSend = async () =>
     {
@@ -162,24 +115,9 @@ const Chat = () =>
 
         if(text === "") return;
 
-        let imgUrl = null;
 
         // updating the chat in firestore
         try{     
-            if (img?.file)
-            {
-                console.log("Image object:", img); 
-                console.log("Image file detected, uploading..." );
-
-                imgUrl = await upload(img.file)
-                console.log("Uploaded Image URL:",imgUrl)
-            }
-
-            else {
-                console.log("No image file detected.");
-            }
-            
-
              // Update chat in Firestore
             await updateDoc(doc(db,"chats" ,chatId) ,
             {
@@ -193,27 +131,58 @@ const Chat = () =>
             [`typingStatus.${currentUser.id}`]: false
         });
 
-        // Update unread count for the recipient
-        const recipientChatRef = doc(db, "userchats", user.id);
-        const recipientChatsSnapshot = await getDoc(recipientChatRef);
+        // Update chat status for sender (currentUser)
+        const senderChatRef = doc(db, "userchats", currentUser.id);
+        const senderChatsSnapshot = await getDoc(senderChatRef);
 
-        if (recipientChatsSnapshot.exists()) {
-            const recipientChats = recipientChatsSnapshot.data().chats;
-            const chatIndex = recipientChats.findIndex(c => c.chatId === chatId);
+        if (senderChatsSnapshot.exists()) {
+            const senderChatsData = senderChatsSnapshot.data();
+            const chatIndex = senderChatsData.chats.findIndex(c => c.chatId === chatId);
 
             if (chatIndex !== -1) {
                 const updatedChat = {
-                    ...recipientChats[chatIndex],
+                    ...senderChatsData.chats[chatIndex],
                     lastMessage: text,
-                    updatedAt: currentTime.getTime(),
-                    unreadCount: (recipientChats[chatIndex].unreadCount || 0) + 1 // Increment unread count
+                    updatedAt: Timestamp.now(),
+                    unreadCount: 0, // Sender's unread count stays at 0
+                    isSeen: true,
+                    chatId: chatId,
+                    receiverId: user.id
                 };
 
-                const updatedChats = [...recipientChats];
+                const updatedChats = [...senderChatsData.chats];
                 updatedChats[chatIndex] = updatedChat;
 
-                await updateDoc(recipientChatRef, {
-                    chats: updatedChats,
+                await updateDoc(senderChatRef, {
+                    chats: updatedChats
+                });
+            }
+        }
+
+        // Update chat status for receiver
+        const receiverChatRef = doc(db, "userchats", user.id);
+        const receiverChatsSnapshot = await getDoc(receiverChatRef);
+
+        if (receiverChatsSnapshot.exists()) {
+            const receiverChatsData = receiverChatsSnapshot.data();
+            const chatIndex = receiverChatsData.chats.findIndex(c => c.chatId === chatId);
+
+            if (chatIndex !== -1) {
+                const updatedChat = {
+                    ...receiverChatsData.chats[chatIndex],
+                    lastMessage: text,
+                    updatedAt: Timestamp.now(),
+                    unreadCount: (receiverChatsData.chats[chatIndex].unreadCount || 0) + 1, // Increment receiver's unread count
+                    isSeen: false,
+                    chatId: chatId,
+                    receiverId: currentUser.id
+                };
+
+                const updatedChats = [...receiverChatsData.chats];
+                updatedChats[chatIndex] = updatedChat;
+
+                await updateDoc(receiverChatRef, {
+                    chats: updatedChats
                 });
             }
         }
@@ -222,72 +191,13 @@ const Chat = () =>
         setText("") // clear input after sending the message
         setIsTyping(false); // Reset local typing state
         
-
-        // Update last message for both users
-        const userIDs = [currentUser.id , user.id];
-
-        for (const id of userIDs)
-        {
-        // getting the userchats from firestore
-        const userChatRef = doc(db,"userchats",id)
-        const userChatsSnapshot = await getDoc(userChatRef)
-
-        // if the userchats exists
-        if(userChatsSnapshot.exists())
-            {
-            const userChatsData = userChatsSnapshot.data() // getting the userchats data
-            const chatIndex = userChatsData.chats.findIndex(c => c.chatId === chatId) // finding the chat index
-            
-            if(chatIndex !== -1)
-                {
-                    // Created chat object with updated values
-                    const updatedChat =
-                    {
-                        ...userChatsData.chats[chatIndex], // copying the existing chat
-                        lastMessage: text, // updating the last message
-                        isSeen: id === currentUser.id ? true: false, // updating the isSeen to true because we have sent the message
-                        updatedAt: Timestamp.now(), // updating the updatedAt time
-                        unreadCount: 0 ,
-                        chatId:chatId, // updating the chatId
-                        receiverId: id === currentUser.id ? user.id : currentUser.id // updating the receiverId
-                        
-                    }
-
-                    // Updated chats array with the updated chat
-                    const updatedChats = [...userChatsData.chats]; // Copy all chats
-                    updatedChats[chatIndex] = updatedChat // Update the specific chat
-                    
-                    // Updating the userchats in firestore
-                     await updateDoc(userChatRef ,   
-                {
-                    chats: updatedChats, // Updating the chats array with the updated chat
-                });
-
-                console.log(
-                    `User chat updated for user ID ${id} with chat ID ${chatId}`
-                );
-
-                }
-
-            }
-
-            else {
-                console.log(`User chat for ID ${id} not found.`);
-            }
-        }
     }
         catch(err)
         {
             console.error("Error sending messages:", err);
         }
 
-        setImg({
-            file:null,
-            url:""
-        });
-
-        console.log("Image state reset.");
-    }
+    };
 
     // Handling emoji 
     const handleEmoji = e =>
@@ -440,14 +350,14 @@ const Chat = () =>
 
                             {/* Chat text starts */}
                             <div className="chat-texts">
-                                {message.img && (
+                                {/* {message.img && (
                                     <div className="image-container">
                                         <img src={message.img} className='sender-image' alt='User uploaded image' />
                                         <span className='three-dots' onClick={() => handleClickOpen(message)}>...</span>
                                         <span className="message-time">{formatMessageTime(message.createdAt)}</span>
                                     </div>
                                     
-                                )}
+                                )} */}
                                 
                                 {message.text && (
                                     <div className="text-container">
