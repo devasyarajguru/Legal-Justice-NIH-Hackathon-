@@ -167,7 +167,9 @@ const ChatList = () =>
             }
             changeChat(item.chatId,userWithId)
 
-            // Reset unread count when chat is selected
+            
+            // Only reset unread count when there are unread messages
+        if (item.unreadCount > 0) {
             const userChatRef = doc(db, "userchats", currentUser.id);
             const userChatsSnapshot = await getDoc(userChatRef);
 
@@ -178,7 +180,8 @@ const ChatList = () =>
                 if (chatIndex !== -1) {
                     const updatedChat = {
                         ...userChatsData.chats[chatIndex],
-                        unreadCount: 0 // Reset unread count for current user
+                        unreadCount: 0 ,
+                        isSeen: true
                     };
 
                     const updatedChats = [...userChatsData.chats];
@@ -190,6 +193,7 @@ const ChatList = () =>
                 }
             }
         } 
+    }
 
     // Function to Filter out names
     const filterChats = chats.filter(item =>
