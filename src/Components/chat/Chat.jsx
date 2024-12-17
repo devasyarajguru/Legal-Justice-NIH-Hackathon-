@@ -105,8 +105,6 @@ const Chat = () =>
     // Handling Send button
     const handleSend = async () =>
     {
-        console.log("Handle Send function triggered!"); 
-
         // if the chatId, user or currentUser is not found, return
         if (!chatId || !user || !currentUser?.id || text.trim() === "") {
             console.log("Missing chatId, user, or currentUser.");
@@ -168,12 +166,16 @@ const Chat = () =>
             const chatIndex = receiverChatsData.chats.findIndex(c => c.chatId === chatId);
 
             if (chatIndex !== -1) {
+
+                const receiverChat = receiverChatsData.chats[chatIndex];
+                const isReceiverActive = receiverChat.activeChatId === chatId;
+
                 const updatedChat = {
-                    ...receiverChatsData.chats[chatIndex],
+                    ...receiverChat,
                     lastMessage: text,
                     updatedAt: Timestamp.now(),
-                    unreadCount: (receiverChatsData.chats[chatIndex].unreadCount || 0) + 1, // Increment receiver's unread count
-                    isSeen: false,
+                    unreadCount: isReceiverActive ? 0 : (receiverChat.unreadCount || 0) + 1,
+                    isSeen: isReceiverActive,
                     chatId: chatId,
                     receiverId: currentUser.id
                 };
