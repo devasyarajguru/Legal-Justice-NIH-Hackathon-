@@ -9,6 +9,8 @@ import { doc, onSnapshot , getDoc, setDoc , Timestamp, updateDoc} from 'firebase
 import { db } from '../../lib/firebase';
 import NewUser from './newUser/NewUser'
 import { chatStore } from '../../lib/chatStore';
+import AlertDialog from "../../AlertDialog";
+import { toast } from 'react-toastify';
 
 
 // 2:14:20
@@ -23,6 +25,10 @@ const ChatList = () =>
         const {changeChat} = chatStore(); // getting the changeBlock function from chatStore
 
         const [selectedChat,setSelectedChat] = useState(null); // selected chat variable
+
+        const [dialogOpen, setDialogOpen] = useState(false);
+        const [chatToDelete, setChatToDelete] = useState(null);
+        const [dialogMessage, setDialogMessage] = useState('');
 
         // Getting the chat list of the current user
         useEffect(() =>
@@ -191,6 +197,44 @@ const ChatList = () =>
             }
         };
 
+        const handleClickOpen = (e, item) => {
+            e.stopPropagation(); // Prevent chat selection when clicking dots
+            setChatToDelete(item);
+            setDialogMessage(`Are you sure you want to delete chat with ${item.user?.username}?`);
+            setDialogOpen(true);
+        };
+    
+        const handleClose = () => {
+            setDialogOpen(false);
+            setChatToDelete(null);
+        };
+    
+        const handleDeleteChat = async () => {
+            if (!chatToDelete) return;
+            
+            try {
+                const userChatRef = doc(db, "userchats", currentUser.id);
+                const userChatsSnapshot = await getDoc(userChatRef);
+    
+                if (userChatsSnapshot.exists()) {
+                    const userChatsData = userChatsSnapshot.data();
+                    const updatedChats = userChatsData.chats.filter(
+                        chat => chat.chatId !== chatToDelete.chatId
+                    );
+    
+                    await updateDoc(userChatRef, {
+                        chats: updatedChats
+                    });
+    
+                    toast.success("Chat deleted successfully");
+                    handleClose();
+                }
+            } catch (error) {
+                console.error("Error deleting chat:", error);
+                toast.error("Failed to delete chat");
+            }
+        };
+
     // Function to Filter out names
     const filterChats = chats.filter(item =>
         item?.user?.username?.toLowerCase().includes(searchItem.toLowerCase())
@@ -245,7 +289,14 @@ const ChatList = () =>
                     <div className="texts">
                         <div className="name-time">
                             <span className="name">{item.user?.username || "Unknown user"}</span>
+                            <span 
+                        className='three-dots' 
+                        onClick={(e) => handleClickOpen(e, item)}
+                    >
+                        ...
+                    </span>
                             <span className="time">
+                           
                                 {item.updatedAt ? formatMessageTime(item.updatedAt) : ""}
                             </span>
                         </div>
@@ -258,12 +309,19 @@ const ChatList = () =>
                             </div>
                         )}
                     </div>
+                    
                 </div>
                 ))}
 
                 {/* Chat item ends*/}
                 {addMode && <NewUser />}
-            </div>
+                <AlertDialog
+                open={dialogOpen}
+                handleClose={handleClose}
+                handleDelete={handleDeleteChat}
+                message={dialogMessage}
+            />
+        </div>
             // chatList main container ends
 
         )
