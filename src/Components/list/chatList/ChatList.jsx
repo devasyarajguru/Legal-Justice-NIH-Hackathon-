@@ -141,59 +141,55 @@ const ChatList = () =>
 
 
         // Function to handle the selection of the chat
-        const handleSelect = async(item) =>
-        {
-            setSelectedChat(item.chatId)
-            console.log("Selecting chat: ",
-                {
-                    fullItem: item,
-                    chatId: item.chatId,
-                    user: item.user,
-                    userId: item.user?.id || item.receiverId
-                }
-            );
-
-            if(!item?.chatId || !item?.user)
-            {
-                console.error("Missing chat data in Handleselect: ",item);
+        const handleSelect = async(item) => {
+            setSelectedChat(item.chatId);
+            
+            if(!item?.chatId || !item?.user) {
+                console.error("Missing chat data in HandleSelect:", item);
                 return;
             }
             
-            // Creating a user object with the id of receiver
-            const userWithId = 
-            {
+            const userWithId = {
                 ...item.user,
-                id:item.receiverId
-            }
-            changeChat(item.chatId,userWithId)
-
-            
-            // Only reset unread count when there are unread messages
-        if (item.unreadCount > 0) {
+                id: item.receiverId
+            };
+            changeChat(item.chatId, userWithId);
+    
+            // Always update the active chat status when selecting a chat
             const userChatRef = doc(db, "userchats", currentUser.id);
             const userChatsSnapshot = await getDoc(userChatRef);
-
+    
             if (userChatsSnapshot.exists()) {
                 const userChatsData = userChatsSnapshot.data();
                 const chatIndex = userChatsData.chats.findIndex(c => c.chatId === item.chatId);
-
+    
                 if (chatIndex !== -1) {
-                    const updatedChat = {
-                        ...userChatsData.chats[chatIndex],
-                        unreadCount: 0 ,
-                        isSeen: true
-                    };
-
                     const updatedChats = [...userChatsData.chats];
-                    updatedChats[chatIndex] = updatedChat;
-
+                    
+                    // Update the selected chat
+                    updatedChats[chatIndex] = {
+                        ...updatedChats[chatIndex],
+                        unreadCount: 0,
+                        isSeen: true,
+                        activeChatId: item.chatId
+                    };
+    
+                    // Clear activeChatId from all other chats
+                    updatedChats.forEach((chat, index) => {
+                        if (index !== chatIndex) {
+                            updatedChats[index] = {
+                                ...chat,
+                                activeChatId: null
+                            };
+                        }
+                    });
+    
                     await updateDoc(userChatRef, {
-                        chats: updatedChats,
+                        chats: updatedChats
                     });
                 }
             }
-        } 
-    }
+        };
 
     // Function to Filter out names
     const filterChats = chats.filter(item =>
