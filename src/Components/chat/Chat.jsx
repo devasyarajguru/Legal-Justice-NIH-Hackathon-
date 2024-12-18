@@ -11,7 +11,6 @@ import { db } from '../lib/firebase';
 import { chatStore } from '../lib/chatStore';
 import { useUserStore } from '../lib/userStore';
 import AlertDialog from '../AlertDialog'; // Import the AlertDialog component
-// import { toast } from 'react-toastify';
 import Notification from '../Notification'
 
 // Testing commits
