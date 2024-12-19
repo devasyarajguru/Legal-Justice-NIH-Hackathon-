@@ -14,6 +14,8 @@ import { toast } from 'react-toastify';
 
 
 // 2:14:20
+// Testing commits
+
 const ChatList = () =>
     {
         const [chats, setChats] = useState([])  // chats from firestore database variable
@@ -296,7 +298,6 @@ const ChatList = () =>
                         ...
                     </span>
                             <span className="time">
-                           
                                 {item.updatedAt ? formatMessageTime(item.updatedAt) : ""}
                             </span>
                         </div>
@@ -308,8 +309,8 @@ const ChatList = () =>
                                 {item.unreadCount}
                             </div>
                         )}
+                        
                     </div>
-                    
                 </div>
                 ))}
 
@@ -321,7 +322,8 @@ const ChatList = () =>
                 handleDelete={handleDeleteChat}
                 message={dialogMessage}
             />
-        </div>
+            </div>
+            
             // chatList main container ends
 
         )
