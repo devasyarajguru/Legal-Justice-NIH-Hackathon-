@@ -15,7 +15,6 @@ import { toast } from 'react-toastify';
 
 // 2:14:20
 // Testing commits
-// Testing commits
 const ChatList = () =>
     {
         const [chats, setChats] = useState([])  // chats from firestore database variable
